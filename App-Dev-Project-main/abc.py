@@ -1,7 +1,7 @@
-a = ['a', 'b', 'c']
-b = ['a', 'c', 'd']
+import re
 
-for i in a:
-    if i in b:
-        print('nice')
-
+a = re.search("""[!@#$%^&*()_+-={}|<>?,./;':`~\][0-9]""", "1abc")
+if a:
+    print("yes")
+else:
+    print("no")
