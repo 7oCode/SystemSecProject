@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt
 import re
 import cryptography
 from cryptography.fernet import Fernet
-
+from SQL_Functions import *
 app = Flask(__name__)
 bcrypt = Bcrypt()
 
@@ -16,7 +16,7 @@ app.secret_key = 'very secret'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'password123'
-app.config['MYSQL_DB'] = 'pythonlogin'
+app.config['MYSQL_DB'] = 'sys_sec'
 
 # Initialize MySQL
 mysql = MySQL(app)
@@ -28,7 +28,6 @@ def homepage():
 
 @app.route('/WebApp', methods=['GET', 'POST'])
 def login():
-
     #Output message is something is wrong
     msg=''
 
@@ -38,32 +37,10 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        #Check if account exists using MySQL
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s', (username,))
-
-        #Fetch one record and return result
-        ## Need to change ##
-        account = cursor.fetchone()
-        user_hashpwd = account['password']
-
-        if account and bcrypt.check_password_hash(user_hashpwd, password):
-            #Create session data, data can be accessed in other routes
-            session['loggedin'] = True
-            session['id'] = account['id']
-            session['username'] = account['username']
-
-            encrypted_email = account['email'].encode()
-
-            file = open('symmetric.key', 'rb')
-            key = file.read()
-            file.close()
-            f = Fernet(key)
-            decrypted_email = f.decrypt(encrypted_email)
-
-            #Redirect to home page
-            print(f"Logged in successfully with {decrypted_email.decode()}")
+        if SQL_Login(username, password) == 0:
             return redirect(url_for('home'))
+        elif SQL_Login(username, password) == 1:
+            msg = 'Incorrect username/password'
     else:
         #Account doesn't exist or username/password incorrect
         msg = 'Incorrect username/password'
@@ -91,29 +68,10 @@ def register():
         password = request.form['password']
         email = request.form['email']
 
-        hashpwd = bcrypt.generate_password_hash(password)
-        email = email.encode()
-
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s', (username,))
-        dupe = cursor.fetchone()
-        if not dupe:
+        if SQL_Register(username, password, email) == 0:
+            msg = 'Successful registration'
+        elif SQL_Register(username, password, email) == 1:
             msg = 'Duplicate found'
-        else:
-            mysql.connection.commit()
-            msg='Successful Registration :)'
-
-        key = Fernet.generate_key()
-        with open('symmetric.key', 'wb') as fo:
-            fo.write(key)
-
-        f = Fernet(key)
-
-        encrypted_email = f.encrypt(email)
-
-        cursor.execute('INSERT INTO accounts VALUES (NULL, %s, %s, %s)',(username, hashpwd, encrypted_email))
-        mysql.connection.commit()
-        msg = 'Successful registration'
 
 
     elif request.method == 'POST':
