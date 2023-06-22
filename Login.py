@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for,session
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 from flask_bcrypt import Bcrypt
@@ -6,6 +6,8 @@ import re
 import cryptography
 from cryptography.fernet import Fernet
 from SQL_Functions import *
+from CounterRateLimiting import *
+
 app = Flask(__name__)
 bcrypt = Bcrypt()
 
@@ -21,17 +23,24 @@ app.config['MYSQL_DB'] = 'sys_sec'
 # Initialize MySQL
 mysql = MySQL(app)
 
+
 # http://localhost:5000/P_SQL/ - this will be the login page, we need to use both GET and POST requests
-@app.route('/', methods=['GET','POST'])
+@app.route('/', methods=['GET', 'POST'])
 def homepage():
     return redirect(url_for('login'))
 
+
+c = Counter()
+
 @app.route('/WebApp', methods=['GET', 'POST'])
 def login():
-    #Output message is something is wrong
-    msg=''
+    # Output message is something is wrong
+    msg = ''
 
-    #Check if username and password requests exists (user submitted form)
+    if c.i == 3:
+        return render_template('stop.html')
+
+    # Check if username and password requests exists (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         # Variables for easy access
         username = request.form['username']
@@ -41,30 +50,33 @@ def login():
             return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
             msg = 'Incorrect username/password'
+            print(c.i)
+            c.i +=1
             return render_template('index.html', msg=msg)
 
     # else:
     #     #Account doesn't exist or username/password incorrect
     #     msg = 'Incorrect username/password'
 
-    #Login form with message (if any)
+    # Login form with message (if any)
     return render_template('index.html', msg='')
 
 
-#http://localhost:5000/P_SQL/logout - the logout page
+# http://localhost:5000/P_SQL/logout - the logout page
 @app.route('/logout')
 def logout():
-    #Remove session data, the user will be logged out
+    # Remove session data, the user will be logged out
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
 
-    #Redirect to login page
+    # Redirect to login page
     return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    msg=''
+    msg = ''
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
         username = request.form['username']
         password = request.form['password']
@@ -77,33 +89,33 @@ def register():
 
 
     elif request.method == 'POST':
-        #Form is empty (no POST Data)
-        msg='Please fill out the form'
+        # Form is empty (no POST Data)
+        msg = 'Please fill out the form'
 
     return render_template('register.html', msg=msg)
 
 
-#http://localhost:5000/home - Home page, only accessible for logged in users
+# http://localhost:5000/home - Home page, only accessible for logged in users
 @app.route('/home')
 def home():
-    #Check if user is logged in
+    # Check if user is logged in
     if 'loggedin' in session:
-        return render_template('home.html',username=session['username'])
+        return render_template('home.html', username=session['username'])
 
-    #User is not loggedin, redirect to login page
+    # User is not loggedin, redirect to login page
     return redirect(url_for('login'))
 
 
-#http://localhost:5000/profile = Profile page, only accesible for logged in users
+# http://localhost:5000/profile = Profile page, only accesible for logged in users
 @app.route('/profile')
 def profile():
     if 'loggedin' in session:
-        #All account info for the user to display it on the profile page
+        # All account info for the user to display it on the profile page
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM accounts WHERE id = %s", (session['id'],))
         account = cursor.fetchone()
 
-        #Show profile page with account info
+        # Show profile page with account info
         return render_template('profile.html', account=account)
 
     # User is not logged in, redirect to login page
