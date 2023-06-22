@@ -47,7 +47,11 @@ def SQL_Login(username, password):
     #Fetch one record and return result
     ## Need to change ##
     userlogin = cursor.fetchone()
-    user_hashpwd = userlogin['password']
+    try:
+        user_hashpwd = userlogin['password']
+    except TypeError:
+        return 1
+    print(userlogin['id'])
 
     if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
         #Create session data, data can be accessed in other routes
@@ -64,5 +68,3 @@ def SQL_Login(username, password):
         decrypted_email = f.decrypt(encrypted_email)
         print(f"Logged in successfully with {decrypted_email.decode()}")
         return 0
-    else:
-        return 1

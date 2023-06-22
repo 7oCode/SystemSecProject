@@ -41,9 +41,11 @@ def login():
             return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
             msg = 'Incorrect username/password'
-    else:
-        #Account doesn't exist or username/password incorrect
-        msg = 'Incorrect username/password'
+            return render_template('index.html', msg=msg)
+
+    # else:
+    #     #Account doesn't exist or username/password incorrect
+    #     msg = 'Incorrect username/password'
 
     #Login form with message (if any)
     return render_template('index.html', msg='')
