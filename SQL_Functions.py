@@ -68,3 +68,4 @@ def SQL_Login(username, password):
         decrypted_email = f.decrypt(encrypted_email)
         print(f"Logged in successfully with {decrypted_email.decode()}")
         return 0
+#login done
