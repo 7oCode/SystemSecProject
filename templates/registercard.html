@@ -1,0 +1,89 @@
+<head>
+  <link rel="stylesheet" href="registercard.css">
+  <script src='register .js'>
+
+  </script>
+</head>
+
+<div class="nav"></div>
+
+<div class="credit-card-page-container">
+  <h1 class="billing-title">Billing</h1>
+</div>
+
+<div class="layout-container">
+  <div class="left-col">
+    <h2>Your Cards</h2>
+        <p>You haven't added a credit card yet.</p>
+
+<!--         <div class="your-cards-container">
+          <div class="credit-card-loader">
+            <div class="credit-card-loader-fill"></div>
+            <div class="card-animation"></div>
+          </div>
+        </div> -->
+<!--         <div class="your-cards-container">
+      <div class="card-icon">
+        <div class="icon"></div>
+      </div>
+      <div class="card-info"><span class="card">Master Card</span> ending in 5444</div>
+      <div class="edit">EDIT</div>
+    </div> -->
+
+            <h2 class="order-history-title">Order History</h2>
+    <p>You haven't purchased anything yet.</p>
+  </div>
+  <div class="right-col">
+        <h2>Add Card</h2>
+
+    <div class="credit-card-container">
+  <div class="bg-circle-one"></div>
+  <div class="bg-circle-two"></div>
+  <div class="chip"></div>
+  <div class="credit-card-number-container">
+    <div class="first-four-numbers"></div>
+    <div class="second-four-numbers"></div>
+    <div class="third-four-numbers"></div>
+    <div class="fourth-four-numbers"></div>
+  </div>
+  <div class="name-container">
+    <div class="first-name"></div>
+    <div class="last-name"></div>
+  </div>
+
+  <div class="date-container">
+    <div class="date"></div>
+  </div>
+
+
+  <div class="master-card-logo-container">
+    <div class="yellow-circle"></div>
+    <div class="red-circle"></div>
+  </div>
+
+</div>
+
+<form>
+      <div class="inputLabel">Card Number</div>
+      <input type="number" placeholder="CARD NUMBER" class="card-number" required>
+
+      <div class="inputLabel">First Name</div>
+      <input type="text" placeholder="First Name" class="first-name-input"  onkeydown="return /[a-zA-Z]/i.test(event.key)" required>
+
+      <div class="inputLabel">Last Name</div>
+      <input type="text" placeholder="Last Name" class="last-name-input" onkeydown="return /[a-zA-Z]/i.test(event.key)" required>
+
+      <div class="card-info-container">
+        <div class="expiration-date-container">
+          <div class="inputLabel">Expiration Date</div>
+          <input type="month" class="exp-date-input" required>
+        </div>
+        <div class="cvv-container">
+          <div class="inputLabel">CVV</div>
+          <input type="number" placeholder="123" class="cvv-input" required>
+        </div>
+      </div>
+      </form>
+  <button class="add-card">ADD CARD</button>
+  </div>
+</div>
