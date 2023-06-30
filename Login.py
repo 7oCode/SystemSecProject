@@ -37,7 +37,6 @@ c = Counter()
 def login():
     # Output message is something is wrong
     msg = ''
-
     if c.i == 3:
         return render_template('stop.html')
 
@@ -113,14 +112,26 @@ def profile():
     if 'loggedin' in session:
         # All account info for the user to display it on the profile page
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT * FROM accounts WHERE id = %s", (session['id'],))
+        cursor.execute("SELECT * FROM users WHERE id = %s", (session['id'],))
         account = cursor.fetchone()
 
+        encrypted_email = account['email'].encode()
+
+        file = open('symmetric.key', 'rb')
+        key = file.read()
+        file.close()
+        f = Fernet(key)
+        decrypted_email = f.decrypt(encrypted_email)
+
         # Show profile page with account info
-        return render_template('profile.html', account=account)
+        return render_template('profile.html', account=account, decrypted_email=decrypted_email)
 
     # User is not logged in, redirect to login page
     return redirect(url_for('login'))
+
+@app.route('/card')
+def card():
+    return render_template('registercard.html')
 
 
 if __name__ == '__main__':

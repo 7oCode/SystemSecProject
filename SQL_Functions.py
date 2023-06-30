@@ -51,7 +51,6 @@ def SQL_Login(username, password):
         user_hashpwd = userlogin['password']
     except TypeError:
         return 1
-    print(userlogin['id'])
 
     if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
         #Create session data, data can be accessed in other routes
@@ -69,3 +68,6 @@ def SQL_Login(username, password):
         print(f"Logged in successfully with {decrypted_email.decode()}")
         return 0
 #login done
+
+def SQL_registerCard():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)

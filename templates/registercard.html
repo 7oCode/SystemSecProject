@@ -1,11 +1,14 @@
+{% extends 'layout.html' %}
+{% block content %}
+
 <head>
-  <link rel="stylesheet" href="registercard.css">
-  <script src='register .js'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='registercard.css') }}">
+  <script src="{{ url_for('static', filename='register.js') }}">
 
   </script>
 </head>
 
-<div class="nav"></div>
+<!---<div class="nav"></div>--->
 
 <div class="credit-card-page-container">
   <h1 class="billing-title">Billing</h1>
@@ -83,7 +86,8 @@
           <input type="number" placeholder="123" class="cvv-input" required>
         </div>
       </div>
-      </form>
+</form>
   <button class="add-card">ADD CARD</button>
   </div>
 </div>
+{% endblock %}
