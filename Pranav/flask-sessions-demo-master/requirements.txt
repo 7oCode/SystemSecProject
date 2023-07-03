@@ -1,0 +1,9 @@
+Click
+dominate
+Flask
+Flask-Bootstrap
+itsdangerous
+Jinja2
+MarkupSafe
+visitor
+Werkzeug
