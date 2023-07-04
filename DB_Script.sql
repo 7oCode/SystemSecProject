@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `card_info`(
 	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`fullname` varchar(50) NOT NULL,
 	`card_num` varchar(16) NOT NULL,
-	`exp_date` varchar() NOT NULL,
+	`exp_date` varchar(7) NOT NULL,
     `cvv` varchar(3) NOT NULL,
     PRIMARY KEY (`id`)
 )
