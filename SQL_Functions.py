@@ -1,3 +1,5 @@
+# import Bcrypt as Bcrypt
+
 from Login import *
 from flask_mysqldb import MySQL
 from flask import Flask, session
@@ -69,5 +71,30 @@ def SQL_Login(username, password):
         return 0
 #login done
 
-def SQL_registerCard():
+#assumption: 1 person, multiple cards, unique name, unique number
+def SQL_registerCard(fname, lname, card_num, exp_date, cvv):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('Select * from card_info where card_num = %s', (card_num,))
+    usercard = cursor.fetchone()
+    try:
+        u_card = usercard['card_num'].encode()
+        file = open('symmetric.key', 'rb')
+        key = file.read()
+        file.close()
+        f = Fernet(key)
+        dec_card = f.decrypt(u_card)
+        de_card = dec_card.decode()
+    except:
+        return 1
+
+    if de_card == card_num:
+        return 2
+    else:
+        n_card = f.encrypt(card_num)
+        cursor.execute("Insert into card_info values (NULL, concat_ws(' ', %s, %s), %s, %s, %s", (fname, lname, n_card, exp_date,cvv,))
+        print('Card added')
+        mysql.connection.commit()
+        return 0
+
+
+

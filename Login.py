@@ -7,6 +7,7 @@ import cryptography
 from cryptography.fernet import Fernet
 from SQL_Functions import *
 from CounterRateLimiting import *
+from forms import *
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -77,22 +78,21 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
+    regform = RegisterForm()
 
+    if regform.validate_on_submit():
+        username = regform.username.data
+        password = regform.password.data
+        email = regform.email.data
         if SQL_Register(username, password, email) == 0:
             msg = 'Successful registration'
         elif SQL_Register(username, password, email) == 1:
             msg = 'Duplicate found'
-
-
     elif request.method == 'POST':
         # Form is empty (no POST Data)
         msg = 'Please fill out the form'
 
-    return render_template('register.html', msg=msg)
+    return render_template('register.html',msg=msg, form=regform)
 
 
 # http://localhost:5000/home - Home page, only accessible for logged in users
@@ -129,9 +129,23 @@ def profile():
     # User is not logged in, redirect to login page
     return redirect(url_for('login'))
 
-@app.route('/card')
+@app.route('/card', methods=['GET', 'POST'])
 def card():
-    return render_template('registercard.html')
+    msg=''
+    regcard = RegisterCard()
+    if regcard.validate_on_submit():
+        if SQL_registerCard(regcard.fname.data, regcard.lname.data, regcard.card_num.data,
+                            regcard.exp_date.data, regcard.cvv.data) == 1:
+            msg = 'Error'
+        elif SQL_registerCard(regcard.fname.data, regcard.lname.data, regcard.card_num.data,
+                          regcard.exp_date.data, regcard.cvv.data) == 2:
+            msg = 'Duplicate Found'
+        elif SQL_registerCard(regcard.fname.data, regcard.lname.data, regcard.card_num.data,
+                          regcard.exp_date.data, regcard.cvv.data) == 0:
+            msg = "Card Added"
+
+
+    return render_template('registercard.html', form=regcard, msg=msg)
 
 
 if __name__ == '__main__':

@@ -67,27 +67,38 @@
 </div>
 
 <form>
+  			{{ form.csrf_token }}
+
       <div class="inputLabel">Card Number</div>
-      <input type="number" placeholder="CARD NUMBER" class="card-number" required>
+        	{{ form.card_num }}
 
       <div class="inputLabel">First Name</div>
-      <input type="text" placeholder="First Name" class="first-name-input"  onkeydown="return /[a-zA-Z]/i.test(event.key)" required>
+        	{{ form.fname }}
 
       <div class="inputLabel">Last Name</div>
-      <input type="text" placeholder="Last Name" class="last-name-input" onkeydown="return /[a-zA-Z]/i.test(event.key)" required>
+        	{{ form.lname }}
 
       <div class="card-info-container">
         <div class="expiration-date-container">
           <div class="inputLabel">Expiration Date</div>
-          <input type="month" class="exp-date-input" required>
-        </div>
-        <div class="cvv-container">
-          <div class="inputLabel">CVV</div>
-          <input type="number" placeholder="123" class="cvv-input" required>
+        	{{ form.exp_date }}
         </div>
       </div>
+         <div class="cvv-container">
+          <div class="inputLabel">CVV</div>
+            {{ form.cvv }}
+               {{ msg }}
+
+        </div>
+<!--        	{{ form.card_num }}-->
+<!--        	{{ form.fname }}-->
+<!--        	{{ form.lname }}-->
+<!--        	{{ form.exp_date }}-->
+<!--            {{ form.cvv }}-->
+
+    <input type="submit" value="Add Card">
 </form>
-  <button class="add-card">ADD CARD</button>
+<!--  <button class="add-card">ADD CARD</button>-->
   </div>
 </div>
 {% endblock %}
