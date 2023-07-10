@@ -1,5 +1,5 @@
 from wtforms import StringField, PasswordField,validators
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import InputRequired, Length, Regexp
 from flask_wtf import FlaskForm
 import re
 
@@ -29,15 +29,13 @@ class LoginForm(FlaskForm):
 
 
 class RegisterCard(FlaskForm):
-    fname = StringField('fname', validators=[InputRequired('First Name required'), Length(min=4, max=20, message='Proper name please'),
-                                             validators.Regexp('[a-zA-Z]+')], render_kw={'placeholder': 'First Name'})
+    fname = StringField('fname', validators=[InputRequired('First Name required'), Length(min=4, max=20, message='Proper name please'), Regexp(r'^[a-zA-Z]+$')], render_kw={'placeholder': 'First Name'})
 
-    lname = StringField('fname', validators=[InputRequired('Last Name required'), Length(min=4, max=20, message='Proper name please'),
-                                             validators.Regexp('[a-zA-Z]+')], render_kw={'placeholder': 'Last Name'})
+    lname = StringField('fname', validators=[InputRequired('Last Name required'), Length(min=4, max=20, message='Proper name please'), Regexp(r'^[a-zA-Z]+$')], render_kw={'placeholder': 'Last Name'})
 
-    card_num = StringField('card_num', validators=[InputRequired('Card number required'), Length(min=16,max=16, message='Valid number please'),
-                                                   validators.Regexp('[0-9]+')], render_kw={'placeholder': 'Card Number'})
-    exp_date = StringField('exp_date', validators=[InputRequired('Expiry date required'), Length(min=7, max=7, message='YYYY/MM Format'),
-                                                   validators.Regexp('^20[0-2][0-9]/0[1-9]1[0-2]')], render_kw={'placeholder': 'YYYY/MM'})
-    cvv = StringField('cvv', validators=[InputRequired('CVV Required'), Length(min=3, max=3, message='CVV')], render_kw={'placeholder': 'CVV'})
+    exp_date = StringField('exp_date', validators=[InputRequired('Expiry date required'), Length(min=7, max=7, message='YYYY/MM Format'), Regexp(r'^20[0-3][0-9]/(0[1-9]|1[0-2])$')], render_kw={'placeholder': 'YYYY/MM'})
+    cvv = StringField('cvv', validators=[InputRequired('CVV Required'), Length(min=3, max=3, message='CVV'), Regexp(r'^\d+$')], render_kw={'placeholder': 'CVV'})
+
+    card_num = StringField('card_num', validators=[InputRequired('Card number required'), Length(min=16,max=16, message='Valid number please'),Regexp(r'^\d+$')], render_kw={'placeholder': 'Card Number'})
+
 

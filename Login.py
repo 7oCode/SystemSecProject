@@ -6,8 +6,7 @@ import re
 import cryptography
 from cryptography.fernet import Fernet
 from SQL_Functions import *
-from CounterRateLimiting import *
-
+from forms import *
 app = Flask(__name__)
 bcrypt = Bcrypt()
 
@@ -30,15 +29,15 @@ def homepage():
     return redirect(url_for('login'))
 
 
-c = Counter()
+# c = Counter()
 
 #limiting done
 @app.route('/WebApp', methods=['GET', 'POST'])
 def login():
     # Output message is something is wrong
     msg = ''
-    if c.i == 3:
-        return render_template('stop.html')
+    # if c.i == 3:
+    #     return render_template('stop.html')
 
     # Check if username and password requests exists (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
@@ -50,8 +49,8 @@ def login():
             return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
             msg = 'Incorrect username/password'
-            print(c.i)
-            c.i +=1
+            # print(c.i)
+            # c.i +=1
             return render_template('index.html', msg=msg)
 
     # else:
@@ -77,22 +76,22 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
+    regform = RegisterForm()
 
+    if regform.validate_on_submit():
+        username = regform.username.data
+        password = regform.password.data
+        email = regform.email.data
         if SQL_Register(username, password, email) == 0:
             msg = 'Successful registration'
         elif SQL_Register(username, password, email) == 1:
             msg = 'Duplicate found'
-
-
     elif request.method == 'POST':
         # Form is empty (no POST Data)
         msg = 'Please fill out the form'
 
-    return render_template('register.html', msg=msg)
+    return render_template('register.html',msg=msg, form=regform)
+
 
 
 # http://localhost:5000/home - Home page, only accessible for logged in users
@@ -132,19 +131,29 @@ def profile():
 @app.route('/card', methods=['GET', 'POST'])
 def card():
     msg=''
-    if request.method == 'POST' and 'card_no' in request.form and'fname' in request.form  and 'lname' in request.form  and 'exp_date' in request.form and 'cvv' in request.form:
-        card_no = request.form['card_no']
-        fname = request.form['fname']
-        lname = request.form['lname']
-        exp_date = request.form['exp_date']
-        cvv = request.form['cvv']
+    regcard = RegisterCard()
+    if regcard.validate_on_submit():
+        fname = regcard.fname.data
+        lname = regcard.lname.data
+        fullname = fname + ' ' + lname
+        card_num = regcard.card_num.data
+        exp_date = regcard.exp_date.data
+        cvv = regcard.cvv.data
+        if SQL_registerCard(card_num,fname,lname,exp_date, cvv) == 1:
+            msg = 'Same Card?'
+        elif SQL_registerCard(card_num,fname,lname,exp_date,cvv) == 0:
 
-        if SQL_registerCard(card_no, fname, lname, exp_date, cvv) == 1:
-            msg='Error in registering'
-        elif SQL_registerCard(card_no, fname, lname, exp_date, cvv) == 0:
-            msg = f"Card registered to {session['username']}"
+        # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        # cursor.execute("INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, %s)", (
+        #     card_num,fname,lname, exp_date, cvv,))
+        # mysql.connection.commit()
+        # print('card added')
+            msg = "Card Added"
+    else:
+        print(regcard.fname.data,regcard.lname.data,regcard.card_num.data,regcard.exp_date.data,
+              regcard.cvv.data)
 
-    return render_template('registercard.html', msg=msg)
+    return render_template('registercard.html', msg=msg, form=regcard)
 
 
 if __name__ == '__main__':

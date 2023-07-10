@@ -83,8 +83,12 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
 
     cursor.execute('SELECT * FROM card_info WHERE card_no = %s', (card_no,))
     dupe = cursor.fetchone()
-    c_num = dupe['card_no'].encode()
+    try:
+        c_num = dupe['card_no'].encode()
+    except TypeError:
+        pass
     decrypted_card = c_num.decode()
+
     if decrypted_card == card_no:
         return 1
     else:
