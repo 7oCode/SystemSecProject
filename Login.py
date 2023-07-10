@@ -129,9 +129,22 @@ def profile():
     # User is not logged in, redirect to login page
     return redirect(url_for('login'))
 
-@app.route('/card')
+@app.route('/card', methods=['GET', 'POST'])
 def card():
-    return render_template('registercard.html')
+    msg=''
+    if request.method == 'POST' and 'card_no' in request.form and'fname' in request.form  and 'lname' in request.form  and 'exp_date' in request.form and 'cvv' in request.form:
+        card_no = request.form['card_no']
+        fname = request.form['fname']
+        lname = request.form['lname']
+        exp_date = request.form['exp_date']
+        cvv = request.form['cvv']
+
+        if SQL_registerCard(card_no, fname, lname, exp_date, cvv) == 1:
+            msg='Error in registering'
+        elif SQL_registerCard(card_no, fname, lname, exp_date, cvv) == 0:
+            msg = f"Card registered to {session['username']}"
+
+    return render_template('registercard.html', msg=msg)
 
 
 if __name__ == '__main__':

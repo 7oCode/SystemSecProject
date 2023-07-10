@@ -15,8 +15,8 @@ mysql = MySQL(app)
 
 def SQL_Register(username, password, email):
 
-        hashpwd = bcrypt.generate_password_hash(password)
-        email = email.encode()
+        # hashpwd = bcrypt.generate_password_hash(password)
+        # email = email.encode()
 
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
@@ -24,8 +24,9 @@ def SQL_Register(username, password, email):
         if dupe:
             return 1
         else:
-            mysql.connection.commit()
-            msg='Successful Registration :)'
+            hashpwd = bcrypt.generate_password_hash(password)
+            email = email.encode()
+            # mysql.connection.commit()
 
             key = Fernet.generate_key()
             with open('symmetric.key', 'wb') as fo:
@@ -69,5 +70,35 @@ def SQL_Login(username, password):
         return 0
 #login done
 
-def SQL_registerCard():
+# cvv must be encrypted
+#assumption: Person -> Cards
+#               1..1     1..*
+def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    key = Fernet.generate_key()
+    with open('symmetric.key', 'wb') as fo:
+        fo.write(key)
+
+    f = Fernet(key)
+
+    cursor.execute('SELECT * FROM card_info WHERE card_no = %s', (card_no,))
+    dupe = cursor.fetchone()
+    c_num = dupe['card_no'].encode()
+    decrypted_card = c_num.decode()
+    if decrypted_card == card_no:
+        return 1
+    else:
+        # mysql.connection.commit()
+
+        key = Fernet.generate_key()
+        with open('symmetric.key', 'wb') as fo:
+            fo.write(key)
+
+        f = Fernet(key)
+
+        encrypted_cvv = f.encrypt(cvv)
+        encrypted_card_no = f.encrypt(card_no)
+
+        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, %s)', (encrypted_card_no, fname, lname, exp_date, encrypted_cvv))
+        mysql.connection.commit()
+        return 0
