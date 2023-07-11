@@ -2,6 +2,7 @@ from Login import *
 from flask_mysqldb import MySQL
 from flask import Flask, session
 from cryptography.fernet import Fernet
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -29,7 +30,7 @@ def SQL_Register(username, password, email):
             # mysql.connection.commit()
 
             key = Fernet.generate_key()
-            with open('symmetric.key', 'wb') as fo:
+            with open('symmetric_user.key', 'wb') as fo:
                 fo.write(key)
 
             f = Fernet(key)
@@ -61,7 +62,7 @@ def SQL_Login(username, password):
 
         encrypted_email = userlogin['email'].encode()
 
-        file = open('symmetric.key', 'rb')
+        file = open('symmetric_user.key', 'rb')
         key = file.read()
         file.close()
         f = Fernet(key)
@@ -76,33 +77,36 @@ def SQL_Login(username, password):
 def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     key = Fernet.generate_key()
-    with open('symmetric.key', 'wb') as fo:
+    fullname = fname + ' ' + lname
+    with open('symmetric_card.key', 'wb') as fo:
         fo.write(key)
 
     f = Fernet(key)
 
-    cursor.execute('SELECT * FROM card_info WHERE card_no = %s', (card_no,))
+    cursor.execute('SELECT * FROM card_info WHERE card_num = %s', (card_no,))
     dupe = cursor.fetchone()
+    decrypted_card = None
     try:
         c_num = dupe['card_no'].encode()
+        decrypted_card = c_num.decode()
     except TypeError:
-        pass
-    decrypted_card = c_num.decode()
+        decrypted_card = 0
 
+    print(decrypted_card)
     if decrypted_card == card_no:
         return 1
     else:
         # mysql.connection.commit()
 
-        key = Fernet.generate_key()
-        with open('symmetric.key', 'wb') as fo:
+        # key = Fernet.generate_key()
+        with open('symmetric_card.key', 'wb') as fo:
             fo.write(key)
 
         f = Fernet(key)
 
-        encrypted_cvv = f.encrypt(cvv)
-        encrypted_card_no = f.encrypt(card_no)
+        encrypted_cvv = f.encrypt(cvv.encode())
+        encrypted_card_no = f.encrypt(card_no.encode())
 
-        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, %s)', (encrypted_card_no, fname, lname, exp_date, encrypted_cvv))
+        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv,))
         mysql.connection.commit()
         return 0

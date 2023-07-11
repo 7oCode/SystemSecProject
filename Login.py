@@ -139,16 +139,11 @@ def card():
         card_num = regcard.card_num.data
         exp_date = regcard.exp_date.data
         cvv = regcard.cvv.data
-        if SQL_registerCard(card_num,fname,lname,exp_date, cvv) == 1:
-            msg = 'Same Card?'
-        elif SQL_registerCard(card_num,fname,lname,exp_date,cvv) == 0:
+        if SQL_registerCard(card_num,fname,lname,exp_date, cvv) == 0:
+            msg = 'Card added'
+        elif SQL_registerCard(card_num,fname,lname,exp_date,cvv) == 1:
+            msg = "Error in adding card"
 
-        # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        # cursor.execute("INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, %s)", (
-        #     card_num,fname,lname, exp_date, cvv,))
-        # mysql.connection.commit()
-        # print('card added')
-            msg = "Card Added"
     else:
         print(regcard.fname.data,regcard.lname.data,regcard.card_num.data,regcard.exp_date.data,
               regcard.cvv.data)
