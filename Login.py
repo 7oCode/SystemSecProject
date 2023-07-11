@@ -132,6 +132,8 @@ def profile():
 def card():
     msg=''
     regcard = RegisterCard()
+    nList = readCards()
+    print(nList)
     if regcard.validate_on_submit():
         fname = regcard.fname.data
         lname = regcard.lname.data
@@ -148,7 +150,7 @@ def card():
         print(regcard.fname.data,regcard.lname.data,regcard.card_num.data,regcard.exp_date.data,
               regcard.cvv.data)
 
-    return render_template('registercard.html', msg=msg, form=regcard)
+    return render_template('registercard.html', msg=msg, form=regcard, cards=nList)
 
 
 if __name__ == '__main__':

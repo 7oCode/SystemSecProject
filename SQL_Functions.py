@@ -87,7 +87,7 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
     dupe = cursor.fetchone()
     decrypted_card = None
     try:
-        c_num = dupe['card_no'].encode()
+        c_num = dupe['card_num'].encode()
         decrypted_card = c_num.decode()
     except TypeError:
         decrypted_card = 0
@@ -107,6 +107,24 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
         encrypted_cvv = f.encrypt(cvv.encode())
         encrypted_card_no = f.encrypt(card_no.encode())
 
-        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv,))
+        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, NULL)', (fullname, encrypted_card_no, exp_date, encrypted_cvv,))
         mysql.connection.commit()
         return 0
+
+def readCards():
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM card_info')
+    cList = cursor.fetchall()
+    cList = list(cList)
+    file = open('symmetric_card.key', 'rb')
+    key = file.read()
+    file.close()
+    f = Fernet(key)
+    j = 0
+    for i in cList:
+        encrypted_card = i['card_num'].encode()
+        decrypted_card = f.decrypt(encrypted_card)
+        i['card_num'] = decrypted_card.decode()
+        cList[j]['card_num'] = i['card_num']
+        j+=1
+    return cList

@@ -17,8 +17,30 @@
 <div class="layout-container">
   <div class="left-col">
     <h2>Your Cards</h2>
-        <p>You haven't added a credit card yet.</p>
+      <table>
+          <th>
 
+              <tr>
+                  <th>Full Name</th>
+                  <th>Card Number</th>
+                  <th>Expiry Date</th>
+              </tr>
+          </th>
+          <tbody>
+          {% for card in cards %}
+            <tr>
+                <td>{{card['fullname']}}</td>
+                <td>{{card['card_num']}}</td>
+                <td>{{card['exp_date']}}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+      </table>
+
+
+
+
+       <p>You haven't added a credit card yet.</p>
 <!--         <div class="your-cards-container">
           <div class="credit-card-loader">
             <div class="credit-card-loader-fill"></div>

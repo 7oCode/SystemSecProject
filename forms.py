@@ -38,3 +38,7 @@ class RegisterCard(FlaskForm):
     card_num = StringField('card_num', validators=[InputRequired('Card number required'), Length(min=16,max=16, message='Valid number please'),Regexp(r'^\d+$')], render_kw={'placeholder': 'Card Number'})
 
 
+class UpdateCard(FlaskForm):
+    u_card_num = StringField('card_num', validators=[InputRequired('Card number required'), Length(min=16,max=16, message='Valid number please'),Regexp(r'^\d+$')], render_kw={'placeholder': 'Card Number'})
+
+
