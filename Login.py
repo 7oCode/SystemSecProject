@@ -34,31 +34,19 @@ def homepage():
 #limiting done
 @app.route('/WebApp', methods=['GET', 'POST'])
 def login():
-    # Output message is something is wrong
-    msg = ''
-    # if c.i == 3:
-    #     return render_template('stop.html')
-
-    # Check if username and password requests exists (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-        # Variables for easy access
-        username = request.form['username']
-        password = request.form['password']
+    msg=''
+    login = LoginForm()
+    if login.validate_on_submit():
+        username = login.username.data
+        password = login.password.data
 
         if SQL_Login(username, password) == 0:
             return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
-            msg = 'Incorrect username/password'
-            # print(c.i)
-            # c.i +=1
-            return render_template('index.html', msg=msg)
+            msg = 'Incorrect Username/Password'
+            return render_template('index.html', msg=msg, form=login)
 
-    # else:
-    #     #Account doesn't exist or username/password incorrect
-    #     msg = 'Incorrect username/password'
-
-    # Login form with message (if any)
-    return render_template('index.html', msg='')
+    return render_template('index.html', msg='', form=login)
 
 
 # http://localhost:5000/P_SQL/logout - the logout page

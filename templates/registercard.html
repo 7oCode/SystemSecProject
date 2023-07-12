@@ -17,6 +17,7 @@
 <div class="layout-container">
   <div class="left-col">
     <h2>Your Cards</h2>
+      {% if cards|length != 0 %}
       <table>
           <th>
 
@@ -27,20 +28,21 @@
               </tr>
           </th>
           <tbody>
-          {% for card in cards %}
+            {% for card in cards %}
             <tr>
                 <td>{{card['fullname']}}</td>
                 <td>{{card['card_num']}}</td>
                 <td>{{card['exp_date']}}</td>
             </tr>
-          {% endfor %}
+            {% endfor %}
           </tbody>
       </table>
+      {% endif %}
 
 
-
-
-       <p>You haven't added a credit card yet.</p>
+        {% if cards|length == 0 %}
+        <p>You haven't added a credit card yet.</p>
+        {% endif %}
 <!--         <div class="your-cards-container">
           <div class="credit-card-loader">
             <div class="credit-card-loader-fill"></div>

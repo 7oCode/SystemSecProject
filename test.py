@@ -18,3 +18,5 @@ for i in toCheck:
 
 toCheck = list(toCheck)
 print(type(toCheck))
+
+nCheck = [1,2,3,4]

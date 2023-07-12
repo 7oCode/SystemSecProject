@@ -4,16 +4,13 @@ from flask_wtf import FlaskForm
 
 class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired('Username required'),
-                                                   Length(min=5, max=10, message='5-10 characters'),
-                                                   ],render_kw={"placeholder": "Username"})
+                                                   Length(min=5, max=10, message='5-10 characters')],render_kw={"placeholder": "Username"})
 
     password = PasswordField('password', validators=[InputRequired('Password required'),
-                                                     Length(min=8, max=20, message='At least 8 characters'),
-                                                     validators.Regexp("^\w+$", message='Must be alphanumeric')],
-                             render_kw={"placeholder": "Password"})
+                                                     Length(min=8, max=20, message='At least 8 characters')],render_kw={"placeholder": "Password"})
 
     email = StringField('email', validators=[InputRequired('Email Required'),
-                                             Length(min=4, max=20)],render_kw={"placeholder": "Email"})
+                                             Length(min=4, max=20), Regexp(r'^(?!.*@mymail\.nyp\.edu\.sg).*@.*$')],render_kw={"placeholder": "Email"})
 
 
 class LoginForm(FlaskForm):
