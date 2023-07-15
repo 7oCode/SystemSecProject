@@ -6,6 +6,8 @@ import re
 from cryptography.fernet import Fernet
 from SQL_Functions import *
 from forms import *
+from twilio.rest import Client
+import random
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -80,7 +82,28 @@ def login():
         password_validation = password_check(password)
 
         if SQL_Login(username, password) == 0 and password_validation['password_ok']:
-            return redirect(url_for('home'))
+            # Generate OTP and store it in the session
+            otp = str(random.randint(100000, 999999))
+            session['otp'] = otp
+
+            # Get user's phone number from the database
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            phone_number = user['phone']
+
+            # Send OTP via SMS
+            account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
+            auth_token = '2a3e659c1c1bd8f6a281b21c89ec019a'
+            client = Client(account_sid, auth_token)
+
+            message = client.messages.create(
+                body=f"Your OTP is {otp}",
+                from_='89038239',
+                to=phone_number
+            )
+
+            return redirect(url_for('verify_otp'))
         else:
             msg = 'Incorrect Username/Password'
 
@@ -88,6 +111,17 @@ def login():
             return render_template('index.html', msg=msg, form=login, password_validation=password_validation)
 
     return render_template('index.html', msg='', form=login)
+
+@app.route('/verify_otp', methods=['GET', 'POST'])
+def verify_otp():
+    if request.method == 'POST':
+        user_otp = request.form.get('otp')
+        if 'otp' in session and user_otp == session['otp']:
+            session.pop('otp')
+            return redirect(url_for('home'))
+        else:
+            return render_template('verify_otp.html', error='Invalid OTP')
+    return render_template('verify_otp.html')
 
 
 @app.route('/logout')
@@ -106,22 +140,24 @@ def register():
         username = regform.username.data
         password = regform.password.data
         email = regform.email.data
+        phone = regform.phone.data  # Get the phone data from the form
 
         # Validate the password using password_check()
         password_validation = password_check(password)
 
         if password_validation['password_ok']:
-            if SQL_Register(username, password, email) == 0:
+            if SQL_Register(username, password, email, phone) == 0:  # Pass the phone data to the SQL_Register function
                 msg = 'Successful registration'
-            elif SQL_Register(username, password, email) == 1:
+            elif SQL_Register(username, password, email, phone) == 1:  # Pass the phone data to the SQL_Register function
                 msg = 'Duplicate found'
         else:
             msg = 'Invalid password. Please make sure your password meets the requirements.'
-
     elif request.method == 'POST':
         msg = 'Please fill out the form'
+        print(regform.errors)  # Print form errors
 
     return render_template('register.html', msg=msg, form=regform)
+
 
 
 @app.route('/home')

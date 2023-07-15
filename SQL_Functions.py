@@ -14,32 +14,28 @@ app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
 
 
-def SQL_Register(username, password, email):
+def SQL_Register(username, password, email, phone):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
+    dupe = cursor.fetchone()
+    if dupe:
+        return 1
+    else:
+        hashpwd = bcrypt.generate_password_hash(password)
+        email = email.encode()
 
-        # hashpwd = bcrypt.generate_password_hash(password)
-        # email = email.encode()
+        key = Fernet.generate_key()
+        with open('symmetric_user.key', 'wb') as fo:
+            fo.write(key)
 
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
-        dupe = cursor.fetchone()
-        if dupe:
-            return 1
-        else:
-            hashpwd = bcrypt.generate_password_hash(password)
-            email = email.encode()
-            # mysql.connection.commit()
+        f = Fernet(key)
 
-            key = Fernet.generate_key()
-            with open('symmetric_user.key', 'wb') as fo:
-                fo.write(key)
+        encrypted_email = f.encrypt(email)
 
-            f = Fernet(key)
+        cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s)', (username, hashpwd, encrypted_email, phone))
+        mysql.connection.commit()
+        return 0
 
-            encrypted_email = f.encrypt(email)
-
-            cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s)',(username, hashpwd, encrypted_email))
-            mysql.connection.commit()
-            return 0
 
 def SQL_Login(username, password):
     #Check if account exists using MySQL
