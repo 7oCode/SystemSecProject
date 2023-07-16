@@ -38,7 +38,7 @@ def password_check(password):
     """
 
     # calculating the length
-    length_error = len(password) < 8
+    length_error = len(password) >= 8
 
     # searching for digits
     digit_error = re.search(r"\d", password) is None
@@ -54,14 +54,18 @@ def password_check(password):
 
     # overall result
     password_ok = not (length_error or digit_error or uppercase_error or lowercase_error or symbol_error)
-
+    passClear = re.search(r"""^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$""", password) is not None
+    print(passClear)
+    # return {
+    #     'password_ok': password_ok,
+    #     'length_error': length_error,
+    #     'digit_error': digit_error,
+    #     'uppercase_error': uppercase_error,
+    #     'lowercase_error': lowercase_error,
+    #     'symbol_error': symbol_error,
+    # }
     return {
-        'password_ok': password_ok,
-        'length_error': length_error,
-        'digit_error': digit_error,
-        'uppercase_error': uppercase_error,
-        'lowercase_error': lowercase_error,
-        'symbol_error': symbol_error,
+        'password_ok': passClear
     }
 
 
@@ -90,7 +94,7 @@ def login():
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
             user = cursor.fetchone()
-            phone_number = user['phone']
+            phone_number = user['phone_no']
 
             # Send OTP via SMS
             account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
@@ -144,6 +148,8 @@ def register():
 
         # Validate the password using password_check()
         password_validation = password_check(password)
+        print(password_validation)
+        print(password)
 
         if password_validation['password_ok']:
             if SQL_Register(username, password, email, phone) == 0:  # Pass the phone data to the SQL_Register function
