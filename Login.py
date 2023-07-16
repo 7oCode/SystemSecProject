@@ -98,12 +98,12 @@ def login():
 
             # Send OTP via SMS
             account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
-            auth_token = '2a3e659c1c1bd8f6a281b21c89ec019a'
+            auth_token = 'f94c6e3669f4da38b2498f5294493925'
             client = Client(account_sid, auth_token)
 
             message = client.messages.create(
                 body=f"Your OTP is {otp}",
-                from_='89038239',
+                from_='+15738594156',
                 to=phone_number
             )
 
