@@ -8,12 +8,16 @@ from SQL_Functions import *
 from forms import *
 from twilio.rest import Client
 import random
+from datetime import timedelta
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
 
 # Change this to your secret key (can be anything, it's for extra protection)
 app.secret_key = 'very secret'
+
+# Set session to expire after 0.5 minutes of inactivity
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
@@ -134,12 +138,19 @@ def verify_otp():
     return render_template('verify_otp.html')
 
 
-@app.route('/logout')
+'''@app.route('/logout')
 def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
+    return redirect(url_for('login'))'''
+
+#updated logout function to ensure that all session data is cleared
+@app.route('/logout')
+def logout():
+    session.clear()  # Clear all session data
     return redirect(url_for('login'))
+
 
 
 @app.route('/register', methods=['GET', 'POST'])
