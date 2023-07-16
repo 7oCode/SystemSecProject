@@ -90,29 +90,35 @@ def login():
             otp = str(random.randint(100000, 999999))
             session['otp'] = otp
 
-            # Get user's phone number from the database
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-            user = cursor.fetchone()
-            phone_number = user['phone_no']
+            # # Get user's phone number from the database
+            # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            # cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            # user = cursor.fetchone()
+            # phone_number = user['phone_no']
+            #
+            # # Send OTP via SMS
+            # account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
+            # auth_token = 'f94c6e3669f4da38b2498f5294493925'
+            # client = Client(account_sid, auth_token)
+            #
+            # message = client.messages.create(
+            #     body=f"Your OTP is {otp}",
+            #     from_='+15738594156',
+            #     to=phone_number
+            # )
 
-            # Send OTP via SMS
-            account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
-            auth_token = 'f94c6e3669f4da38b2498f5294493925'
-            client = Client(account_sid, auth_token)
-
-            message = client.messages.create(
-                body=f"Your OTP is {otp}",
-                from_='+15738594156',
-                to=phone_number
-            )
-
-            return redirect(url_for('verify_otp'))
+            # return redirect(url_for('verify_otp'))
+            return redirect(url_for('home'))
         else:
-            msg = 'Incorrect Username/Password'
+            if SQL_rate_limit(username) == 1:
+                msg = 'Incorrect Username/Password'
+                # Pass the password validation results to the template
+                return render_template('index.html', msg=msg, form=login, password_validation=password_validation)
+            elif SQL_rate_limit(username) == 2:
+                msg = 'Account has been locked'
+                return render_template('index.html', msg=msg, form=login, password_validation=password_validation)
 
-            # Pass the password validation results to the template
-            return render_template('index.html', msg=msg, form=login, password_validation=password_validation)
+
 
     return render_template('index.html', msg='', form=login)
 

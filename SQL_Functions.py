@@ -1,3 +1,5 @@
+import MySQLdb.cursors
+
 from Login import *
 from flask_mysqldb import MySQL
 from flask import Flask, session
@@ -32,7 +34,7 @@ def SQL_Register(username, password, email, phone):
 
         encrypted_email = f.encrypt(email)
 
-        cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s)', (username, hashpwd, encrypted_email, phone))
+        cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0)', (username, hashpwd, encrypted_email, phone,))
         mysql.connection.commit()
         return 0
 
@@ -103,7 +105,7 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
         encrypted_cvv = f.encrypt(cvv.encode())
         encrypted_card_no = f.encrypt(card_no.encode())
 
-        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, NULL)', (fullname, encrypted_card_no, exp_date, encrypted_cvv,))
+        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv,))
         mysql.connection.commit()
         return 0
 
@@ -124,3 +126,31 @@ def readCards():
         cList[j]['card_num'] = i['card_num']
         j+=1
     return cList
+
+def SQL_rate_limit(username):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * from users where username = %s", (username))
+    rCheck = cursor.fetchone()
+    # if rCheck:
+    #     if int(rCheck['rate_limit']) < 3:
+    #         counter = int(rCheck['rate_limit'])
+    #         counter += 1
+    #         cursor.execute('UPDATE users SET rate_limit = %s WHERE username = %s', (counter, username))
+    #         return 1
+    #     else:
+    #         cursor.execute('UPDATE users SET rate_limit = 0 WHERE username = %s', (username))
+    #         return 2
+    # elif not rCheck:
+    #     cursor.execute('SELECT * from users where username = Default')
+    #     nCheck = cursor.fetchone()
+    #     if int(nCheck['rate_limit']) < 3:
+    #         counter = int(nCheck['rate_limit'])
+    #         counter += 1
+    #         cursor.execute('UPDATE users SET rate_limit = %s WHERE username = Default', (counter))
+    #         return 1
+    #     else:
+    #         cursor.execute('UPDATE users SET rate_limit = 0 WHERE username = Default')
+    #         return 2
+    if not rCheck:
+
+
