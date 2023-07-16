@@ -11,6 +11,9 @@ class RegisterForm(FlaskForm):
 
     email = StringField('email', validators=[InputRequired('Email Required'),
                                              Length(min=4, max=20), Regexp(r'^(?!.*@mymail\.nyp\.edu\.sg).*@.*$')],render_kw={"placeholder": "Email"})
+    phone = StringField('phone', validators=[InputRequired('Phone number required'),
+                                             Length(min=8, max=15, message='Valid number please'),
+                                             Regexp(r'^\d+$')], render_kw={"placeholder": "Phone Number"})
 
 
 class LoginForm(FlaskForm):
