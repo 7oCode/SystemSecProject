@@ -104,7 +104,7 @@ def profile():
 
         encrypted_email = account['email'].encode()
 
-        file = open('symmetric.key', 'rb')
+        file = open('symmetric_user.key', 'rb')
         key = file.read()
         file.close()
         f = Fernet(key)
