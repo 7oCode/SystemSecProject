@@ -52,8 +52,16 @@ def SQL_Login(username, password):
     except TypeError:
         return 1
 
-    if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
+    '''if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
         #Create session data, data can be accessed in other routes
+        session['loggedin'] = True
+        session['id'] = userlogin['id']
+        session['username'] = userlogin['username']'''
+    
+    #updated for session management
+    if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
+        # Make the session last beyond the browser being closed
+        session.permanent = True
         session['loggedin'] = True
         session['id'] = userlogin['id']
         session['username'] = userlogin['username']
