@@ -152,5 +152,15 @@ def SQL_rate_limit(username):
     #         cursor.execute('UPDATE users SET rate_limit = 0 WHERE username = Default')
     #         return 2
     if not rCheck:
-
-
+        cursor.execute('SELECT * from users where username = Default')
+        nCheck = cursor.fetchone()
+        if nCheck['rate_limit'] < 3:
+            counter = nCheck['rate_limit']
+            counter += 1
+            cursor.execute('UPDATE users SET rate_limit = %s WHERE username = Default', (counter))
+            mysql.connection.commit()
+            return 1
+        else:
+            cursor.execute('UPDATE users SET rate_limit = 0 WHERE username = Default')
+            mysql.connection.commit()
+            return 2
