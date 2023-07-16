@@ -19,8 +19,7 @@ class LoginForm(FlaskForm):
                                                    ],render_kw={"placeholder": "Username"})
 
     password = PasswordField('password', validators=[InputRequired('Password required'),
-                                                     Length(min=8, max=20,),
-                                                     validators.Regexp("^\w+$",)],
+                                                     Length(min=8, max=20,)],
                              render_kw={"placeholder": "Password"})
 
 
