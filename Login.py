@@ -116,7 +116,7 @@ def login():
             return redirect(url_for('verify_otp'))
             # return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
-            a = SQL_rate_limit_def()
+         `   a = SQL_rate_limit_def()
             if a == 1:
                 msg = 'Incorrect Username/Password1'
                 print(f"{username}, {password}")
@@ -295,7 +295,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
+app.config['MYSQL_PASSWORD'] = 'password123'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
@@ -398,29 +398,29 @@ def login():
         password_validation = password_check(password)
 #  and password_validation['password_ok']
         if SQL_Login(username, password) == 0:
-            # Generate OTP and store it in the session
-            otp = str(randint(100000, 999999))
-            session['otp'] = otp
-
-            # Get user's phone number from the database
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-            user = cursor.fetchone()
-            phone_number = user['phone_no']
-
-            # Send OTP via SMS
-            account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
-            auth_token = 'a49afdd6460799e837ab9a3c237b30bb'
-            client = Client(account_sid, auth_token)
-
-            message = client.messages.create(
-                body=f"Your OTP is {otp}",
-                from_='+15738594156',
-                to=phone_number
-            )
-
-            return redirect(url_for('verify_otp'))
-            # return redirect(url_for('home'))
+                # Generate OTP and store it in the session
+            # otp = str(randint(100000, 999999))
+            # session['otp'] = otp
+            #
+            # # Get user's phone number from the database
+            # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            # cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            # user = cursor.fetchone()
+            # phone_number = user['phone_no']
+            #
+            # # Send OTP via SMS
+            # account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
+            # auth_token = 'a49afdd6460799e837ab9a3c237b30bb'
+            # client = Client(account_sid, auth_token)
+            #
+            # message = client.messages.create(
+            #     body=f"Your OTP is {otp}",
+            #     from_='+15738594156',
+            #     to=phone_number
+            # )
+            #
+            # return redirect(url_for('verify_otp'))
+            return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
             a = SQL_rate_limit_def()
             if a == 1:
@@ -582,9 +582,15 @@ def card():
             msg = 'Card added'
         elif SQL_registerCard(card_num, fname, lname, exp_date, cvv) == 1:
             msg = "Error in adding card"
-    else:
-        print(regcard.fname.data, regcard.lname.data, regcard.card_num.data, regcard.exp_date.data, regcard.cvv.data)
+
+    print(regcard.fname.data, regcard.lname.data, regcard.card_num.data, regcard.exp_date.data, regcard.cvv.data)
     return render_template('registercard.html', msg=msg, form=regcard, cards=nList)
+
+@app.route('/updateCard', methods=['GET', 'POST'])
+def update_card():
+    msg=''
+    updateForm = UpdateCard()
+    return render_template('update.html', msg=msg, form=updateForm)
 
 
 #Start of Google Oauth
