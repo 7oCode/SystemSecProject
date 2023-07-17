@@ -11,29 +11,27 @@
 <!---<div class="nav"></div>--->
 
 <div class="credit-card-page-container">
-  <h1 class="billing-title">Billing</h1>
+  <h1 class="billing-title">Budget</h1>
 </div>
 
 <div class="layout-container">
   <div class="left-col">
-    <h2>Your Cards</h2>
+    <h2>Update Budget</h2>
       <form method="POST" action="{{url_for('card')}}">
   			{{ form.csrf_token }}
 
       <div class="inputLabel">Card Number</div>
         	{{ form.card_num }}
 
-      <div class="inputLabel">First Name</div>
+      <div class="inputLabel">Budget</div>
         	{{ form.card_val }}
 
 
       <div class="card-info-container">
         <div class="expiration-date-container">
-          <div class="inputLabel">Expiration Date</div>
         </div>
       </div>
          <div class="cvv-container">
-          <div class="inputLabel">CVV</div>
                {{ msg }}
 
         </div>
@@ -64,7 +62,6 @@
 <!--    <p>You haven't purchased anything yet.</p>-->
   </div>
   <div class="right-col">
-        <h2>Add Card</h2>
 
     <div class="credit-card-container">
   <div class="bg-circle-one"></div>
