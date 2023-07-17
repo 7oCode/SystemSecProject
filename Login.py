@@ -105,7 +105,7 @@ def login():
 
             # Send OTP via SMS
             account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
-            auth_token = 'f94c6e3669f4da38b2498f5294493925'
+            auth_token = 'a49afdd6460799e837ab9a3c237b30bb'
             client = Client(account_sid, auth_token)
 
             message = client.messages.create(
@@ -113,7 +113,6 @@ def login():
                 from_='+15738594156',
                 to=phone_number
             )
-
             return redirect(url_for('verify_otp'))
             # return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
