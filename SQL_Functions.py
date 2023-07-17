@@ -50,13 +50,27 @@ def SQL_Login(username, password):
     try:
         user_hashpwd = userlogin['password']
     except TypeError:
+            # d = 'Default'
+            # d_s = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            # d_s.execute("SELECT * FROM users WHERE username = %s", (d,))
+            # d_check = d_s.fetchone()
+            # d_num = int(d_check['rate_limit'])
+            # if d_num < 3:
+            #     d_num += 1
+            #     print(d_num)
+            #     d_s.execute("UPDATE users SET rate_limit = %s WHERE username = %s", (str(d_num), d,))
+            #     return 1
+            # else:
+            #     d_s.execute("UPDATE users SET rate_limit = '0' WHERE username = %s", (d,))
+            #     return 2
         return 1
 
-    '''if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
-        #Create session data, data can be accessed in other routes
-        session['loggedin'] = True
-        session['id'] = userlogin['id']
-        session['username'] = userlogin['username']'''
+
+        # '''if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
+        #     #Create session data, data can be accessed in other routes
+        #     session['loggedin'] = True
+        #     session['id'] = userlogin['id']
+        #     session['username'] = userlogin['username']'''
     
     #updated for session management
     if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
@@ -75,6 +89,9 @@ def SQL_Login(username, password):
         decrypted_email = f.decrypt(encrypted_email)
         print(f"Logged in successfully with {decrypted_email.decode()}")
         return 0
+    else:
+        print('Pass no match')
+        return 2
 #login done
 
 # cvv must be encrypted
@@ -135,40 +152,44 @@ def readCards():
         j+=1
     return cList
 
-def SQL_rate_limit(username):
+def SQL_rate_limit_def():
+    d = 'Default'
+    d_s = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    d_s.execute("SELECT * FROM users WHERE username = %s", (d,))
+    d_check = d_s.fetchone()
+    d_num = int(d_check['rate_limit'])
+    if d_num < 3:
+        d_num += 1
+        ds = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        ds.execute("UPDATE users SET rate_limit = %s WHERE username = %s", (d_num, d,))
+        ds.execute("SELECT * FROM users WHERE username = %s", (d,))
+        nCheck = ds.fetchone()
+        mysql.connection.commit()
+        print(nCheck)
+        return 1
+    else:
+        d_s.execute("UPDATE users SET rate_limit = '0' WHERE username = %s", (d,))
+        mysql.connection.commit()
+        print('Return 2')
+        return 2
+
+def SQL_rate_limit_user(username):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT * from users where username = %s", (username))
-    rCheck = cursor.fetchone()
-    # if rCheck:
-    #     if int(rCheck['rate_limit']) < 3:
-    #         counter = int(rCheck['rate_limit'])
-    #         counter += 1
-    #         cursor.execute('UPDATE users SET rate_limit = %s WHERE username = %s', (counter, username))
-    #         return 1
-    #     else:
-    #         cursor.execute('UPDATE users SET rate_limit = 0 WHERE username = %s', (username))
-    #         return 2
-    # elif not rCheck:
-    #     cursor.execute('SELECT * from users where username = Default')
-    #     nCheck = cursor.fetchone()
-    #     if int(nCheck['rate_limit']) < 3:
-    #         counter = int(nCheck['rate_limit'])
-    #         counter += 1
-    #         cursor.execute('UPDATE users SET rate_limit = %s WHERE username = Default', (counter))
-    #         return 1
-    #     else:
-    #         cursor.execute('UPDATE users SET rate_limit = 0 WHERE username = Default')
-    #         return 2
-    if not rCheck:
-        cursor.execute('SELECT * from users where username = Default')
-        nCheck = cursor.fetchone()
-        if nCheck['rate_limit'] < 3:
-            counter = nCheck['rate_limit']
-            counter += 1
-            cursor.execute('UPDATE users SET rate_limit = %s WHERE username = Default', (counter))
-            mysql.connection.commit()
-            return 1
-        else:
-            cursor.execute('UPDATE users SET rate_limit = 0 WHERE username = Default')
-            mysql.connection.commit()
-            return 2
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+    uCheck = cursor.fetchone()
+    uNum = int(uCheck['rate_limit'])
+    if uNum < 3:
+        uNum += 1
+        uNum = str(uNum)
+        uS = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        uS.execute("UPDATE users SET rate_limit = %s WHERE username = %s", (uNum, username,))
+        uS.execute("SELECT * FROM users WHERE username = %s", (username,))
+        uCheck = uS.fetchone()
+        mysql.connection.commit()
+        print(uCheck)
+        return 1
+    else:
+        cursor.execute("UPDATE users SET rate_limit = '0' WHERE username = %s", (username,))
+        mysql.connection.commit()
+        print('Return 2')
+        return 2

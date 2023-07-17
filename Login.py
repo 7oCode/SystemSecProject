@@ -59,7 +59,6 @@ def password_check(password):
     # overall result
     password_ok = not (length_error or digit_error or uppercase_error or lowercase_error or symbol_error)
     passClear = re.search(r"""^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$""", password) is not None
-    print(passClear)
     # return {
     #     'password_ok': password_ok,
     #     'length_error': length_error,
@@ -76,6 +75,10 @@ def password_check(password):
 @app.route('/', methods=['GET', 'POST'])
 def homepage():
     return redirect(url_for('login'))
+
+@app.route('/fail', methods=['GET', 'POST'])
+def failpage():
+    return render_template('stop.html')
 
 
 @app.route('/WebApp', methods=['GET', 'POST'])
@@ -113,18 +116,37 @@ def login():
 
             # return redirect(url_for('verify_otp'))
             return redirect(url_for('home'))
-        else:
-            if SQL_rate_limit(username) == 1:
-                msg = 'Incorrect Username/Password'
-                # Pass the password validation results to the template
-                return render_template('index.html', msg=msg, form=login, password_validation=password_validation)
-            elif SQL_rate_limit(username) == 2:
+        elif SQL_Login(username, password) == 1:
+            a = SQL_rate_limit_def()
+            if a == 1:
+                msg = 'Incorrect Username/Password1'
+                print(f"{username}, {password}")
+            elif a == 2:
+                return redirect(url_for('failpage'))
+        elif SQL_Login(username, password) == 2:
+            u = SQL_rate_limit_user(username)
+            if u == 1:
+                msg = 'Incorrect Username/Password(u)'
+                print(f"{username}, {password}")
+            elif u == 2:
                 msg = 'Account has been locked'
-                return render_template('index.html', msg=msg, form=login, password_validation=password_validation)
 
 
+    # elif request.method == 'POST':
+    #     msg = 'Incorrect Username/Password2'
+    #     print(f"{login.username.data} {login.password.data}")
 
-    return render_template('index.html', msg='', form=login)
+    #         if SQL_rate_limit(username) == 1:
+    #             msg = 'Incorrect Username/Password'
+    #             # Pass the password validation results to the template
+    #             return render_template('index.html', msg=msg, form=login, password_validation=password_validation)
+    #         elif SQL_rate_limit(username) == 2:
+    #             msg = 'Account has been locked'
+    #             return render_template('index.html', msg=msg, form=login, password_validation=password_validation)
+    # elif request.method == 'POST':
+    #     msg = 'Typo'
+
+    return render_template('index.html', msg=msg, form=login)
 
 @app.route('/verify_otp', methods=['GET', 'POST'])
 def verify_otp():
