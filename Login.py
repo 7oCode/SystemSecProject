@@ -97,25 +97,25 @@ def login():
             otp = str(random.randint(100000, 999999))
             session['otp'] = otp
 
-            # # Get user's phone number from the database
-            # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            # cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
-            # user = cursor.fetchone()
-            # phone_number = user['phone_no']
-            #
-            # # Send OTP via SMS
-            # account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
-            # auth_token = 'f94c6e3669f4da38b2498f5294493925'
-            # client = Client(account_sid, auth_token)
-            #
-            # message = client.messages.create(
-            #     body=f"Your OTP is {otp}",
-            #     from_='+15738594156',
-            #     to=phone_number
-            # )
+            # Get user's phone number from the database
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            phone_number = user['phone_no']
 
-            # return redirect(url_for('verify_otp'))
-            return redirect(url_for('home'))
+            # Send OTP via SMS
+            account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
+            auth_token = 'f94c6e3669f4da38b2498f5294493925'
+            client = Client(account_sid, auth_token)
+
+            message = client.messages.create(
+                body=f"Your OTP is {otp}",
+                from_='+15738594156',
+                to=phone_number
+            )
+
+            return redirect(url_for('verify_otp'))
+            # return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
             a = SQL_rate_limit_def()
             if a == 1:
