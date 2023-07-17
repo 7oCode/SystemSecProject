@@ -11,7 +11,7 @@ bcrypt = Bcrypt()
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
 app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
 
@@ -76,7 +76,7 @@ def SQL_Login(username, password):
         # Make the session last beyond the browser being closed
         session.permanent = True
         session['loggedin'] = True
-        session['id'] = userlogin['user_ID']
+        session['id'] = userlogin['id']
         session['username'] = userlogin['username']
 
         encrypted_email = userlogin['email'].encode()

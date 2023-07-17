@@ -1,5 +1,12 @@
 Flask
 Flask-MySQLdb
 Flask-Bcrypt
+flask-wtf
 cryptography
 twilio
+Flask-Mail
+itsdangerous
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+requests

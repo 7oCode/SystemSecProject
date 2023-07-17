@@ -9,8 +9,8 @@ class RegisterForm(FlaskForm):
     password = PasswordField('password', validators=[InputRequired('Password required'),
                                                      Length(min=8, max=20, message='At least 8 characters')],render_kw={"placeholder": "Password"})
 
-    email = StringField('email', validators=[InputRequired('Email Required'),
-                                             Length(min=4, max=20), Regexp(r'^(?!.*@mymail\.nyp\.edu\.sg).*@.*$')],render_kw={"placeholder": "Email"})
+    # email = StringField('email', validators=[InputRequired('Email Required'),
+    #                                          Length(min=4, max=20), Regexp(r'^(?!.*@mymail\.nyp\.edu\.sg).*@.*$')],render_kw={"placeholder": "Email"})
     phone = StringField('phone', validators=[InputRequired('Phone number required'),
                                              Length(min=8, max=15, message='Valid number please'),
                                              Regexp(r'^\+65[89]\d*$')], render_kw={"placeholder": "Phone Number"})
