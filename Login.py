@@ -362,6 +362,7 @@ def password_check(password):
     symbol_error = re.search(r"[ !#$%&'()*+,-./[\]^`{|}~"+r'"]', password) is None
 
     # overall result
+    # MUST CONTAIN SPECIAL CHARACTER
     password_ok = not (length_error or digit_error or uppercase_error or lowercase_error or symbol_error)
     passClear = re.search(r"""^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$""", password) is not None
     # return {
@@ -398,7 +399,7 @@ def login():
         password_validation = password_check(password)
 #  and password_validation['password_ok']
         if SQL_Login(username, password) == 0:
-                # Generate OTP and store it in the session
+            # Generate OTP and store it in the session
             # otp = str(randint(100000, 999999))
             # session['otp'] = otp
             #
