@@ -84,8 +84,9 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `phone_no` varchar(11) NOT NULL,
   `rate_limit` varchar(1) NOT NULL DEFAULT '0',
+  `otp_attempt` varchar(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,7 +95,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (37,'Default','$2b$12$.yDDrmzYty6mdz.au1jIRuXwadLwhHvLu0JlaAgiaev0BvP7txhSC','gAAAAABks60Y6Umrdnb6-IOOLAcdwz18HPgRGsE4WjcfReG639XJOlASWYISaAxHK97qeadaCMDmf_-2IK1m_fRAQ81C3ColTqQXYjDwrzNrblC8E7rw1No=','+6597442152','1'),(42,'NewUser','$2b$12$mcmLyymgLOQDeE2AsVJC6uOKHbV0de4C1k8tC50SCC9OetYd579sm','gAAAAABktKvZxc6WhHI9j2yq4UmjcBNLiIwYCCCFEaPX0_4Lfi9iCZXGFBmD4reDS0-1OanUyS8z7tzHkdd6sOr6xXk5biwowg==','+6583098239','0'),(43,'Another123','$2b$12$uxi1bU6iOqG.DyfVXARCAeAR2mL7Nq6G9bPpA4xwMdpsdUrSv2Chy','gAAAAABktLFjG3_CnMCn03zP31H08wDCoHuAlptefuA0JHjwaqra5v91Zzqfn5Bk9CzgmBG8wGFCpNnMIvBKvYElTFBMJA-kri1nhGPg3J-lLPLe5t_ytDA=','+6597442152','0'),(44,'AnotherUse','$2b$12$P3gDv88xLWaEzXDFTp/F9OQDDThA9vlEN9wAkaOAYYXamCmAyawMu','gAAAAABktLHwZ7uUbxxfBehV0qpjaAqiktGQbYfipqjWlfYDgOJOuXPkBqreduaW_ypxU-5jc-l84ashwomhgUT5nRB6JbE7lA==','+6589038239','0');
+INSERT INTO `users` VALUES (37,'Default','$2b$12$.yDDrmzYty6mdz.au1jIRuXwadLwhHvLu0JlaAgiaev0BvP7txhSC','gAAAAABks60Y6Umrdnb6-IOOLAcdwz18HPgRGsE4WjcfReG639XJOlASWYISaAxHK97qeadaCMDmf_-2IK1m_fRAQ81C3ColTqQXYjDwrzNrblC8E7rw1No=','+6597442152','0','0'),(42,'NewUser','$2b$12$mcmLyymgLOQDeE2AsVJC6uOKHbV0de4C1k8tC50SCC9OetYd579sm','gAAAAABktKvZxc6WhHI9j2yq4UmjcBNLiIwYCCCFEaPX0_4Lfi9iCZXGFBmD4reDS0-1OanUyS8z7tzHkdd6sOr6xXk5biwowg==','+6583098239','0','0'),(43,'Another123','$2b$12$uxi1bU6iOqG.DyfVXARCAeAR2mL7Nq6G9bPpA4xwMdpsdUrSv2Chy','gAAAAABktLFjG3_CnMCn03zP31H08wDCoHuAlptefuA0JHjwaqra5v91Zzqfn5Bk9CzgmBG8wGFCpNnMIvBKvYElTFBMJA-kri1nhGPg3J-lLPLe5t_ytDA=','+6597442152','0','0'),(44,'AnotherUse','$2b$12$P3gDv88xLWaEzXDFTp/F9OQDDThA9vlEN9wAkaOAYYXamCmAyawMu','gAAAAABktLHwZ7uUbxxfBehV0qpjaAqiktGQbYfipqjWlfYDgOJOuXPkBqreduaW_ypxU-5jc-l84ashwomhgUT5nRB6JbE7lA==','+6589038239','0','0'),(45,'JeffNew','$2b$12$RhuRBXf.CU1lWGGQ/M8qnOYnVrDUQvTOzuAnP.33utsh7noCqWevi','gAAAAABktMtrrV4I9pKe9eJQwkB7n6aK6xHCHLP0N2mpvy3FHvQncd84QMhhv8nU6EnP_2-uY462eVgtyxL1Y1tig8_y9pOO8VjZ3OXKmByqMW00ITy0MtM=','+6589038239','0','0'),(46,'TestUser','$2b$12$CLSw9cNrQRX8VpV7HJevHeLiuVWowqReRahJCI6dFlGbJJS.4TZxa','gAAAAABktNwcil7Gtlt-xuqG-ONqA-R3hvzlSx2qZpYjh6gGFRiREslzfFg5EdIlZTdezN6JdCztuUiAkK9_8rd2XnzTBe5weBxCWxfXAN9ZnsPcv87WMWs=','+6589038239','0','0');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -107,4 +108,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-17 11:16:05
+-- Dump completed on 2023-07-21 19:55:46
