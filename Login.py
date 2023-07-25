@@ -277,12 +277,17 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
 
+from flask_wtf import FlaskForm, RecaptchaField
+
 import os
 import pathlib
 import requests
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
+
+app.config['RECAPTCHA_PUBLIC_KEY'] = '6Ld_BVEnAAAAAJWCzb859ZSVXSMN7vxwVOgNkDEk'
+app.config['RECAPTCHA_PRIVATE_KEY'] = '6Ld_BVEnAAAAAEqVkudxjudXLE0WfM0QfBrlX_1V'
 
 s = URLSafeTimedSerializer('Thisisasecret!')
 
@@ -499,6 +504,7 @@ def register():
 
         phone = regform.phone.data  # Get the phone data from the form
         session['phone'] = phone
+
         # Validate the password using password_check()
         password_validation = password_check(password)
         print(password_validation)

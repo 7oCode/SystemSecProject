@@ -1,6 +1,6 @@
 from wtforms import StringField, PasswordField,validators,IntegerField
 from wtforms.validators import InputRequired, Length, Regexp
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 
 class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired('Username required'),
@@ -15,6 +15,8 @@ class RegisterForm(FlaskForm):
                                              Length(min=8, max=15, message='Valid number please'),
                                              Regexp(r'^\+65[89]\d*$')], render_kw={"placeholder": "Phone Number"})
 
+    recaptcha = RecaptchaField()
+
 
 class LoginForm(FlaskForm):
     username = StringField('username', validators=[InputRequired('Username required'),
@@ -24,6 +26,8 @@ class LoginForm(FlaskForm):
     password = PasswordField('password', validators=[InputRequired('Password required'),
                                                      Length(min=8, max=20,)],
                              render_kw={"placeholder": "Password"})
+
+    recaptcha = RecaptchaField()
 
 
 class RegisterCard(FlaskForm):
