@@ -279,6 +279,9 @@ import google.auth.transport.requests
 
 from flask_wtf import FlaskForm, RecaptchaField
 
+from google_auth_oauthlib.flow import Flow, InstalledAppFlow
+import google.auth.transport.requests
+
 import os
 import pathlib
 import requests
@@ -300,7 +303,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
@@ -553,7 +556,25 @@ def home():
     return redirect(url_for('login'))
 
 
-@app.route('/profile')
+# @app.route('/profile')
+# def profile():
+#     if 'loggedin' in session:
+#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#         cursor.execute("SELECT * FROM users WHERE id = %s", (session['id'],))
+#         account = cursor.fetchone()
+#
+#         encrypted_email = account['email'].encode()
+#
+#         file = open('symmetric_user.key', 'rb')
+#         key = file.read()
+#         file.close()
+#         f = Fernet(key)
+#         decrypted_email = f.decrypt(encrypted_email)
+#
+#         return render_template('profile.html', account=account, decrypted_email=decrypted_email)
+#     return redirect(url_for('login'))
+
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'loggedin' in session:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -565,12 +586,52 @@ def profile():
         file = open('symmetric_user.key', 'rb')
         key = file.read()
         file.close()
-        f = Fernet(key)
-        decrypted_email = f.decrypt(encrypted_email)
+        # f = Fernet(key)
+        # decrypted_email = f.decrypt(encrypted_email)
 
-        return render_template('profile.html', account=account, decrypted_email=decrypted_email)
+        if 'google_id' in account:
+            # User registered with Google account
+            if request.method == 'POST':
+                password = request.form.get('password')
+                phone = request.form.get('phone')
+
+                # Validate the password using password_check()
+                password_validation = password_check(password)
+
+                if password_validation['password_ok']:
+                    # Update the user's password and phone number in the database
+                    SQL_UpdatePasswordAndPhone(session['id'], password, phone)
+                    return redirect(url_for('home'))
+                else:
+                    msg = 'Invalid password. Please make sure your password meets the requirements.'
+
+            return render_template('set_password_phone.html')
+
+        return render_template('profile.html', account=account)
+        # return render_template('profile.html', account=account, decrypted_email=decrypted_email)
+
     return redirect(url_for('login'))
 
+@app.route('/set_password_phone', methods=['GET', 'POST'])
+def set_password_phone():
+    if 'loggedin' in session:
+        if 'google_id' in session:
+            if request.method == 'POST':
+                password = request.form.get('password')
+                phone = request.form.get('phone')
+
+                # Validate the password using password_check()
+                password_validation = password_check(password)
+
+                if password_validation['password_ok']:
+                    # Update the user's password and phone number in the database
+                    SQL_UpdatePasswordAndPhone(session['id'], password, phone)
+                    return redirect(url_for('home'))
+                else:
+                    msg = 'Invalid password. Please make sure your password meets the requirements.'
+
+            return render_template('set_password_phone.html')
+    return redirect(url_for('login'))
 
 @app.route('/card', methods=['GET', 'POST'])
 def card():
@@ -616,6 +677,28 @@ def google_login():
     session["state"] = state
     return redirect(authorization_url)
 
+# @app.route("/callback")
+# def callback():
+#     flow.fetch_token(authorization_response=request.url)
+#
+#     if not session["state"] == request.args["state"]:
+#         abort(500)  # State does not match!
+#
+#     credentials = flow.credentials
+#     request_session = requests.session()
+#     cached_session = cachecontrol.CacheControl(request_session)
+#     token_request = google.auth.transport.requests.Request(session=cached_session)
+#
+#     id_info = id_token.verify_oauth2_token(
+#         id_token=credentials._id_token,
+#         request=token_request,
+#         audience=GOOGLE_CLIENT_ID
+#     )
+#
+#     session["google_id"] = id_info.get("sub")
+#     session["name"] = id_info.get("name")
+#     return redirect("/protected_area")
+
 @app.route("/callback")
 def callback():
     flow.fetch_token(authorization_response=request.url)
@@ -634,9 +717,47 @@ def callback():
         audience=GOOGLE_CLIENT_ID
     )
 
-    session["google_id"] = id_info.get("sub")
-    session["name"] = id_info.get("name")
-    return redirect("/protected_area")
+    google_id = id_info.get("sub")
+    name = id_info.get("name")
+    email = id_info.get("email")  # Get the email of the user
+
+    # Check if the Google user is already registered in the database
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * FROM users WHERE google_id = %s", (google_id,))
+    user = cursor.fetchone()
+
+    if user:
+        # User is already registered, set session and redirect
+        session["loggedin"] = True
+        session["id"] = user["id"]
+        session["username"] = user["username"]
+        return redirect(url_for("home"))
+    else:
+        # User is not registered, add the user to the database
+        phone = ""  # You may handle the phone number if needed
+        SQL_RegisterGoogleUser(google_id, name, email, phone)
+
+        # Set session for the new user and redirect to the profile page
+        cursor.execute("SELECT * FROM users WHERE google_id = %s", (google_id,))
+        new_user = cursor.fetchone()
+        session["loggedin"] = True
+        session["id"] = new_user["id"]
+        session["username"] = new_user["username"]
+        return redirect(url_for("profile"))
+
+def SQL_RegisterGoogleUser(google_id, name, email, phone):
+    cursor = mysql.connection.cursor()
+    cursor.execute("INSERT INTO users (google_id, username, password, email, phone_no) VALUES (%s, %s, %s, %s, %s)",
+                   (google_id, name, "", email, phone))
+    mysql.connection.commit()
+    cursor.close()
+
+
+def SQL_UpdatePasswordAndPhone(user_id, password, phone):
+    cursor = mysql.connection.cursor()
+    cursor.execute("UPDATE users SET password = %s, phone_no = %s WHERE id = %s", (password, phone, user_id))
+    mysql.connection.commit()
+    cursor.close()
 
 @app.route("/protected_area")
 @login_is_required
