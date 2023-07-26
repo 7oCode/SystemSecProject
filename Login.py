@@ -581,13 +581,14 @@ def card():
     if regcard.validate_on_submit():
         fname = regcard.fname.data
         lname = regcard.lname.data
+        userID = session['id']
         fullname = fname + ' ' + lname
         card_num = regcard.card_num.data
         exp_date = regcard.exp_date.data
         cvv = regcard.cvv.data
-        if SQL_registerCard(card_num, fname, lname, exp_date, cvv) == 0:
+        if SQL_registerCard(card_num, fname, lname, exp_date, cvv,userID) == 0:
             msg = 'Card added'
-        elif SQL_registerCard(card_num, fname, lname, exp_date, cvv) == 1:
+        elif SQL_registerCard(card_num, fname, lname, exp_date, cvv,userID) == 1:
             msg = "Error in adding card"
 
     print(regcard.fname.data, regcard.lname.data, regcard.card_num.data, regcard.exp_date.data, regcard.cvv.data)
@@ -597,6 +598,14 @@ def card():
 def update_card():
     msg=''
     updateForm = UpdateCard()
+    if updateForm.validate_on_submit():
+        card_num = updateForm.card_num.data
+        card_val = updateForm.card_val.data
+        uID = session['id']
+        if SQL_update_card(card_num,card_val,uID) == 0:
+            msg = 'Successful update!'
+        elif SQL_update_card(card_num,card_val,uID) == 1:
+            msg = 'Error in updating'
     return render_template('update.html', msg=msg, form=updateForm)
 
 

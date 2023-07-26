@@ -96,7 +96,7 @@ def SQL_Login(username, password):
 # cvv must be encrypted
 #assumption: Person -> Cards
 #               1..1     1..*
-def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
+def SQL_registerCard(card_no, fname, lname, exp_date, cvv, userID):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     key = Fernet.generate_key()
     fullname = fname + ' ' + lname
@@ -129,7 +129,7 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
         encrypted_cvv = f.encrypt(cvv.encode())
         encrypted_card_no = f.encrypt(card_no.encode())
 
-        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv,))
+        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, 0, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv, str(userID)))
         mysql.connection.commit()
         return 0
 
@@ -192,3 +192,21 @@ def SQL_rate_limit_user(username):
         mysql.connection.commit()
         print('Return 2')
         return 2
+
+def SQL_update_card(cnum, cval, uID):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * FROM card_info WHERE card_num = %s", (cnum,))
+    dCheck = cursor.fetchone
+    if dCheck:
+        file = open('symmetric_card.key','rb')
+        key = file.read()
+        file.close()
+        f = Fernet(key)
+        update = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        update.execute("UPDATE card_info SET budget = %s WHERE user_id = %s AND card_num = %s", (cval, uID, cnum,))
+        print(update.fetchone())
+        mysql.connection.commit()
+        return 0
+    else:
+        return 1
+
