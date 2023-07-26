@@ -46,3 +46,8 @@ class UpdateCard(FlaskForm):
     card_val = StringField('card_val', validators=[InputRequired('Budget needed'),Length(min=1, max=4, message='Max 9999 budget'),Regexp(r'^\d+$')], render_kw= {'placeholder': 'Value'})
 
 
+class forgetPassword(FlaskForm):
+    email = StringField('email', validators=[InputRequired('Email Required'),
+                                           Length(min=4, max=20), Regexp(r'^(?!.*@mymail\.nyp\.edu\.sg).*@.*$')],render_kw={"placeholder": "Email"})
+
+

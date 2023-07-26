@@ -22,7 +22,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'marksql'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 # Initialize MySQL
@@ -277,6 +277,7 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
 
+
 from flask_wtf import FlaskForm, RecaptchaField
 
 from google_auth_oauthlib.flow import Flow, InstalledAppFlow
@@ -460,6 +461,96 @@ def login():
     #     msg = 'Typo'
 
     return render_template('index.html', msg=msg, form=login)
+
+
+@app.route('/forget_password', methods=['GET', 'POST'])
+def forget():
+    msg = ''
+    forgetForm = forgetPassword()
+    if forgetForm.validate_on_submit():
+        email = forgetForm.email.data
+        if SQL_Check_Email(email) == 0:
+            msg = 'Email sent to user'
+            # link = url_for('confirm_email1', token=token, _external=True)
+
+        elif SQL_Check_Email(email) == 1:
+            msg = 'Error'
+    # if request.method == 'POST':
+    #     email = request.form['email']
+    #
+    #     # Check if the email exists in the SQL database
+    #     if SQL_Check_Email(email):
+    #         # Generate a time-limited token for email verification
+    #         token = s.dumps(email, salt='email-confirm')
+    #
+    #         # Create a message with the verification link and send it via email
+    #         v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])  # Replace with your Gmail email
+    #         link = url_for('confirm_email1', token=token, _external=True)
+    #         v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
+    #         mail.send(v_msg)
+    #
+    #         # Store the email in the session for further processing
+    #         session['email'] = email
+    #
+    #     else:
+    #         # Show an error message if the email does not exist in the database
+    #         error_msg = "Email does not exist in the database. Please enter a valid email address."
+    #         return render_template('forgetpass.html', error=error_msg)
+
+    return render_template('forgetpass.html', msg=msg, form=forgetForm)
+
+
+@app.route('/changepassword')
+def changepassword():
+    return render_template('changepassword.html')
+
+@app.route('/confirm_email1/<token>')
+def confirm_email1(token):
+    try:
+        # Validate the token and extract the email
+        email = s.loads(token, salt='email-confirm', max_age=180)
+
+        # Check if the email exists in the SQL database
+        if SQL_Check_Email(email):
+            # Redirect the user to the password reset page with the email as a query parameter
+            return redirect(url_for('reset_password', email=email))
+        else:
+            # Show an error message if the email does not exist in the database
+            error_msg = "Email does not exist in the database. Please enter a valid email address."
+            return render_template('forgetpass.html', error=error_msg)
+
+    except SignatureExpired:
+        # Handle expired tokens here, e.g., show an error message
+        return render_template('token_expired.html')
+
+
+
+@app.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        new_password = request.form['new_password']
+
+        # Validate the password using password_check()
+        password_validation = password_check(new_password)
+        if password_validation['password_ok']:
+            # Update the password in the database for the given email
+            # (Implement SQL_Update_Password(email, new_password) function)
+
+            # Clear the session data for the email after resetting the password
+            session.pop('email', None)
+
+            # Redirect the user to the login page after successful password resetou
+            return redirect(url_for('login'))
+        else:
+            # Show an error message if the new password is not valid
+            return render_template('reset_password.html', error='Invalid password. Please meet the password requirements.')
+    else:
+        # Show the password reset form
+        return render_template('reset_password.html')
+
+
+
 
 @app.route('/verify_otp', methods=['GET', 'POST'])
 def verify_otp():

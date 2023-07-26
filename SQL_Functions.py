@@ -11,7 +11,7 @@ bcrypt = Bcrypt()
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
+app.config['MYSQL_PASSWORD'] = 'password123'
 app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
 
@@ -96,7 +96,7 @@ def SQL_Login(username, password):
 # cvv must be encrypted
 #assumption: Person -> Cards
 #               1..1     1..*
-def SQL_registerCard(card_no, fname, lname, exp_date, cvv, userID):
+def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     key = Fernet.generate_key()
     fullname = fname + ' ' + lname
@@ -129,7 +129,7 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv, userID):
         encrypted_cvv = f.encrypt(cvv.encode())
         encrypted_card_no = f.encrypt(card_no.encode())
 
-        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, 0, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv, str(userID)))
+        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv,))
         mysql.connection.commit()
         return 0
 
@@ -193,20 +193,28 @@ def SQL_rate_limit_user(username):
         print('Return 2')
         return 2
 
-def SQL_update_card(cnum, cval, uID):
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT * FROM card_info WHERE card_num = %s", (cnum,))
-    dCheck = cursor.fetchone
-    if dCheck:
-        file = open('symmetric_card.key','rb')
-        key = file.read()
-        file.close()
-        f = Fernet(key)
-        update = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        update.execute("UPDATE card_info SET budget = %s WHERE user_id = %s AND card_num = %s", (cval, uID, cnum,))
-        print(update.fetchone())
-        mysql.connection.commit()
-        return 0
-    else:
-        return 1
 
+def SQL_Check_Email(email):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
+    user = cursor.fetchone()
+    cursor.close()
+
+    if user:
+        # Email exists in the database
+        # Generate a time-limited token for email verification
+        token = s.dumps(email, salt='email-confirm')
+
+        # Create a message with the verification link and send it via email
+        v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])  # Replace with your Gmail email
+        # link = url_for('confirm_email1', token=token, _external=True)
+        v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
+        mail.send(v_msg)
+
+        # Store the email in the session for further processing
+        session['email'] = email
+
+        return True
+    else:
+        # Email does not exist in the database
+        return 1
