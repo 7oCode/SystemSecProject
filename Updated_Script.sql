@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `sys_sec` /*!40100 DEFAULT CHARACTER SET utf8mb3 */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `sys_sec`;
 -- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
 --
 -- Host: localhost    Database: sys_sec
@@ -25,14 +23,16 @@ DROP TABLE IF EXISTS `card_info`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `card_info` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `card_ID` int NOT NULL AUTO_INCREMENT,
   `fullname` varchar(50) NOT NULL,
   `card_num` varchar(255) NOT NULL,
   `exp_date` varchar(7) NOT NULL,
   `cvv` varchar(255) NOT NULL,
-  `budget` int DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
+  `budget` varchar(4) DEFAULT '0',
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`card_ID`),
+  KEY `user_id_idx` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `card_info` (
 
 LOCK TABLES `card_info` WRITE;
 /*!40000 ALTER TABLE `card_info` DISABLE KEYS */;
-INSERT INTO `card_info` VALUES (6,'Jeff Card','gAAAAABkrMHVlb2moEXjWg26_2XW0n6i-csWDA3t8NahJG1rO9Q-VslbcQBIMF7VTm8f0nPX_3jx4YAWZAhTlAVdYjsQiO5B9NuGGvzaJUAHiOsLvxS6wjE=','2025/05','gAAAAABkrMHVotZbFy7PHyY8WHQztVJVq7pBGIoNonbSDU5DdoPLaU5Ywr5UdlqnLlt3PZPho0-1VGrABKpCmXfhtVvTtMNZVQ==',NULL);
+INSERT INTO `card_info` VALUES (7,'Jeff Card','gAAAAABkwRSoaq8N1zGXR95EBwjXpqpORMFS1RhVIRezVRDKUQSc3Ujj2mX-GDTzLQVrJOhxrESc97XJMjXKkOy4M-ESFLmIC3BDH-36BY7HtFD5xgAiMoI=','2025/05','gAAAAABkwRSoGywp2O52BFSCgZcCCVlQgwU_yeRlAt9a4OHxSJd-cs5Q0ygt7N0nVBkvByEW6ha6q-Y3lNEWavRa1FQqo23n_g==','0',46);
 /*!40000 ALTER TABLE `card_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -58,7 +58,7 @@ CREATE TABLE `pwd_hist` (
   `user_id` int NOT NULL,
   PRIMARY KEY (`hist_id`),
   KEY `user_id_idx` (`user_id`),
-  CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+  CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -79,14 +79,15 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `user_ID` int NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `phone_no` varchar(11) NOT NULL,
   `rate_limit` varchar(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb3;
+  `otp_attempt` varchar(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`user_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -95,7 +96,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (37,'Default','$2b$12$.yDDrmzYty6mdz.au1jIRuXwadLwhHvLu0JlaAgiaev0BvP7txhSC','gAAAAABks60Y6Umrdnb6-IOOLAcdwz18HPgRGsE4WjcfReG639XJOlASWYISaAxHK97qeadaCMDmf_-2IK1m_fRAQ81C3ColTqQXYjDwrzNrblC8E7rw1No=','+6597442152','0'),(38,'NewUser','$2b$12$a6UIfurjhi21jZxFbgy01emeAHafaADfo2VkJTYlgDZv4WzkhICZu','gAAAAABks7N88ENsPEwpsO1-3mx5Ow2T5OyR5K99D0jjjzwwUKiNXfnx3vnkhu9-jgx7HZm026H_itaX_fgbWqP1BnHBazxy_A==','+6589038239','0'),(39,'JeffNew','$2b$12$7rgvknz1xqjvFQ7ZWo4mkOE0zk4p7LkETpOREz3D87R0asSXdA/lO','gAAAAABktKANXe_euZII1neVVDRSB7RcNILs9j1VG0plwOHtIppFrc0YNo5HxU4rXuaSC3zubLUZcu6ZZuRo_i3iOnBTmIDukQ==','+6589038239','0');
+INSERT INTO `users` VALUES (37,'Default','$2b$12$.yDDrmzYty6mdz.au1jIRuXwadLwhHvLu0JlaAgiaev0BvP7txhSC','gAAAAABks60Y6Umrdnb6-IOOLAcdwz18HPgRGsE4WjcfReG639XJOlASWYISaAxHK97qeadaCMDmf_-2IK1m_fRAQ81C3ColTqQXYjDwrzNrblC8E7rw1No=','+6597442152','1','0'),(42,'NewUser','$2b$12$mcmLyymgLOQDeE2AsVJC6uOKHbV0de4C1k8tC50SCC9OetYd579sm','gAAAAABktKvZxc6WhHI9j2yq4UmjcBNLiIwYCCCFEaPX0_4Lfi9iCZXGFBmD4reDS0-1OanUyS8z7tzHkdd6sOr6xXk5biwowg==','+6583098239','0','0'),(43,'Another123','$2b$12$uxi1bU6iOqG.DyfVXARCAeAR2mL7Nq6G9bPpA4xwMdpsdUrSv2Chy','gAAAAABktLFjG3_CnMCn03zP31H08wDCoHuAlptefuA0JHjwaqra5v91Zzqfn5Bk9CzgmBG8wGFCpNnMIvBKvYElTFBMJA-kri1nhGPg3J-lLPLe5t_ytDA=','+6597442152','0','0'),(44,'AnotherUse','$2b$12$P3gDv88xLWaEzXDFTp/F9OQDDThA9vlEN9wAkaOAYYXamCmAyawMu','gAAAAABktLHwZ7uUbxxfBehV0qpjaAqiktGQbYfipqjWlfYDgOJOuXPkBqreduaW_ypxU-5jc-l84ashwomhgUT5nRB6JbE7lA==','+6589038239','0','0'),(45,'JeffNew','$2b$12$RhuRBXf.CU1lWGGQ/M8qnOYnVrDUQvTOzuAnP.33utsh7noCqWevi','gAAAAABktMtrrV4I9pKe9eJQwkB7n6aK6xHCHLP0N2mpvy3FHvQncd84QMhhv8nU6EnP_2-uY462eVgtyxL1Y1tig8_y9pOO8VjZ3OXKmByqMW00ITy0MtM=','+6589038239','0','0'),(46,'TestUser','$2b$12$CLSw9cNrQRX8VpV7HJevHeLiuVWowqReRahJCI6dFlGbJJS.4TZxa','gAAAAABktNwcil7Gtlt-xuqG-ONqA-R3hvzlSx2qZpYjh6gGFRiREslzfFg5EdIlZTdezN6JdCztuUiAkK9_8rd2XnzTBe5weBxCWxfXAN9ZnsPcv87WMWs=','+6589038239','0','0');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -108,4 +109,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-17 10:23:43
+-- Dump completed on 2023-07-27 10:11:20
