@@ -5,6 +5,7 @@ from flask_mysqldb import MySQL
 from flask import Flask, session
 from cryptography.fernet import Fernet
 from flask_bcrypt import Bcrypt
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -20,6 +21,7 @@ def SQL_Register(username, password, email, phone):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
     dupe = cursor.fetchone()
+    print(dupe)
     if dupe:
         return 1
     else:
@@ -34,7 +36,7 @@ def SQL_Register(username, password, email, phone):
 
         encrypted_email = f.encrypt(email)
 
-        cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0)', (username, hashpwd, encrypted_email, phone,))
+        cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0, 0)', (username, hashpwd, encrypted_email, phone,))
         mysql.connection.commit()
         return 0
 
@@ -96,7 +98,7 @@ def SQL_Login(username, password):
 # cvv must be encrypted
 #assumption: Person -> Cards
 #               1..1     1..*
-def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
+def SQL_registerCard(card_no, fname, lname, exp_date, cvv, uID):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     key = Fernet.generate_key()
     fullname = fname + ' ' + lname
@@ -129,13 +131,13 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv):
         encrypted_cvv = f.encrypt(cvv.encode())
         encrypted_card_no = f.encrypt(card_no.encode())
 
-        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv,))
+        cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, 0, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv, uID))
         mysql.connection.commit()
         return 0
 
-def readCards():
+def readCards(uID):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT * FROM card_info')
+    cursor.execute('SELECT * FROM card_info WHERE user_id = %s', (str(uID),))
     cList = cursor.fetchall()
     cList = list(cList)
     file = open('symmetric_card.key', 'rb')
@@ -212,9 +214,12 @@ def SQL_Check_Email(email):
         mail.send(v_msg)
 
         # Store the email in the session for further processing
-        session['email'] = email
+        session['email'] = emailtop
 
         return True
     else:
         # Email does not exist in the database
         return 1
+
+def SQL_update_card(cnum, cval, uID):
+    pass

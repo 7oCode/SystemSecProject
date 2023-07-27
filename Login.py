@@ -304,7 +304,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
+app.config['MYSQL_PASSWORD'] = 'password123'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
@@ -580,31 +580,40 @@ def register():
     if regform.validate_on_submit():
         username = regform.username.data
         password = regform.password.data
-        email = request.form['email']
-        token = s.dumps(email, salt='email-confirm')
+        email = regform.email.data
+        phone = regform.phone.data
 
-        v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
+        if SQL_Register(username,password,email, phone) == 0:
+            token = s.dumps(email, salt='email-confirm')
 
-        link = url_for('confirm_email', token=token, _external=True)
+            v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
 
-        v_msg.body = 'To confirm your email, click the link {} . The link will expire in 3 minutes! Thank You'.format(
-            link)
+            link = url_for('confirm_email', token=token, _external=True)
 
-        mail.send(v_msg)
+            v_msg.body = 'To confirm your email, click the link {} . The link will expire in 3 minutes! Thank You'.format(
+                link)
 
-        session['username'] = username
-        session['password'] = password
-        session['email'] = email
+            mail.send(v_msg)
 
-        phone = regform.phone.data  # Get the phone data from the form
-        session['phone'] = phone
+            session['username'] = username
+            session['password'] = password
+            session['email'] = email
 
-        # Validate the password using password_check()
-        password_validation = password_check(password)
-        print(password_validation)
-        print(password)
+            # phone = regform.phone.data  # Get the phone data from the form
+            session['phone'] = phone
 
-        return redirect(url_for('email_verification'))
+            # Validate the password using password_check()
+            password_validation = password_check(password)
+            print(password_validation)
+            print(password)
+            token = s.dumps(email, salt='email-confirm')
+            link = url_for('confirm_email', token=token, _external=True)
+
+            return render_template('thanks.html', username=username, password=password, email=email, link=link)
+            # return redirect(url_for('email_verification'))
+        elif SQL_Register(username, password, email, phone) == 1:
+            msg = 'Error'
+
 
     return render_template('register.html', msg=msg, form=regform)
 
@@ -728,7 +737,7 @@ def set_password_phone():
 def card():
     msg = ''
     regcard = RegisterCard()
-    nList = readCards()
+    nList = readCards(session['id'])
     print(nList)
     if regcard.validate_on_submit():
         fname = regcard.fname.data
