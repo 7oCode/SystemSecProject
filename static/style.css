@@ -186,3 +186,13 @@ body.loggedin {
  .google-btn:active {
 	 background: #1669f2;
 }
+
+.modal-content {
+  background-color: darkcyan;
+}
+.btn-link {
+  color: white;
+}
+.modal-heading h2 {
+  color: #ffffff;
+}
