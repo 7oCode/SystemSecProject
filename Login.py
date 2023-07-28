@@ -304,7 +304,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
@@ -580,7 +580,7 @@ def register():
     if regform.validate_on_submit():
         username = regform.username.data
         password = regform.password.data
-        email = regform.email.data
+        email = request.form['email']
         phone = regform.phone.data
 
         if SQL_Register(username,password,email, phone) == 0:

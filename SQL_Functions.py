@@ -12,7 +12,7 @@ bcrypt = Bcrypt()
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
 app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
 
@@ -37,6 +37,8 @@ def SQL_Register(username, password, email, phone):
         encrypted_email = f.encrypt(email)
 
         cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0, 0)', (username, hashpwd, encrypted_email, phone,))
+        # cursor.execute('INSERT INTO users (username, password, email, phone, column1, column2) VALUES (%s, %s, %s, %s, 0, 0)',(username, hashpwd, encrypted_email, phone,))
+
         mysql.connection.commit()
         return 0
 
