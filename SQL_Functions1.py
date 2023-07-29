@@ -1,6 +1,6 @@
 import MySQLdb.cursors
 
-from Login import *
+from Login1 import *
 from flask_mysqldb import MySQL
 from flask import Flask, session
 from cryptography.fernet import Fernet

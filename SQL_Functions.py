@@ -1,6 +1,8 @@
+import os
+
 import MySQLdb.cursors
 
-from Login import *
+from Login1 import *
 from flask_mysqldb import MySQL
 from flask import Flask, session
 from cryptography.fernet import Fernet
@@ -12,7 +14,7 @@ bcrypt = Bcrypt()
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
+app.config['MYSQL_PASSWORD'] = 'password123'
 app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
 
@@ -27,9 +29,12 @@ def SQL_Register(username, password, email, phone):
     else:
         hashpwd = bcrypt.generate_password_hash(password)
         email = email.encode()
-
         key = Fernet.generate_key()
-        with open('symmetric_user.key', 'wb') as fo:
+
+        filename = f"{username}.key"
+        # filedir = r"""C:/Users/Student/Desktop/Modules/IT2656_SystemsSecurityProject/SystemSecProject/newP/symmetric_user"""
+        # filepath = os.path.join(filedir, filename)
+        with open(filename,'wb') as fo:
             fo.write(key)
 
         f = Fernet(key)
@@ -67,7 +72,8 @@ def SQL_Login(username, password):
             # else:
             #     d_s.execute("UPDATE users SET rate_limit = '0' WHERE username = %s", (d,))
             #     return 2
-        return 1
+        print("Pass not found?")
+        return 2
 
         # '''if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
         #     #Create session data, data can be accessed in other routes
@@ -84,8 +90,10 @@ def SQL_Login(username, password):
         session['username'] = userlogin['username']
 
         encrypted_email = userlogin['email'].encode()
-
-        file = open('symmetric_user.key', 'rb')
+        try:
+            file = open(f'{username}.key', 'rb')
+        except FileNotFoundError:
+            print("File Not Found")
         key = file.read()
         file.close()
         f = Fernet(key)
@@ -95,7 +103,8 @@ def SQL_Login(username, password):
     else:
         print('Pass no match')
         return 2
-#login done
+
+
 
 # cvv must be encrypted
 #assumption: Person -> Cards
@@ -124,9 +133,19 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv, uID):
         return 1
     else:
         # mysql.connection.commit()
+        cList = []
+        for filename in os.listdir():
+            if filename.endswith('_card.key') and filename.__contains__(str(uID)):
+                cList.append(filename)
+
+        n = 1
+        for newcard in cList:
+            if newcard == f"{uID}_{n}.key":
+                n += 1
+
 
         # key = Fernet.generate_key()
-        with open('symmetric_card.key', 'wb') as fo:
+        with open(f'{uID}_{n}_card.key', 'wb') as fo:
             fo.write(key)
 
         f = Fernet(key)
@@ -139,21 +158,39 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv, uID):
         return 0
 
 def readCards(uID):
+    print(type(uID))
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT * FROM card_info WHERE user_id = %s', (str(uID),))
-    cList = cursor.fetchone()
+    cursor.execute('SELECT * FROM card_info WHERE user_id = %s', (uID,))
+    cList = cursor.fetchall()
     cList = list(cList)
-    file = open('symmetric_card.key', 'rb')
-    key = file.read()
-    file.close()
-    f = Fernet(key)
+    print(cList)
+
+    # file = open(f'_card.key', 'rb')
+    # key = file.read()
+    # print(key)
+    # file.close()
+    # f = Fernet(key)
+    dList = []
+    for filename in os.listdir():
+        if filename.endswith('_card.key') and filename.__contains__(str(uID)):
+            dList.append(filename)
+    dList.sort()
     j = 0
-    for i in cList:
-        encrypted_card = i['card_num'].encode()
-        decrypted_card = f.decrypt(encrypted_card)
-        i['card_num'] = decrypted_card.decode()
-        cList[j]['card_num'] = i['card_num']
-        j+=1
+    # for a in os.listdir():
+    for i in range(len(cList)):
+        encrypted_card = cList[i]['card_num'].encode()
+        for d in dList:
+            file = open(d, 'rb')
+            key = file.read()
+            file.close()
+            f = Fernet(key)
+            try:
+                decrypted_card = f.decrypt(encrypted_card)
+                cList[i]['card_num'] = decrypted_card.decode()
+            except:
+                continue
+        # cList[j]['card_num'] = i['card_num']
+
     return cList
 
 def SQL_rate_limit_def():
@@ -181,7 +218,10 @@ def SQL_rate_limit_user(username):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
     uCheck = cursor.fetchone()
-    uNum = int(uCheck['rate_limit'])
+    try:
+        uNum = int(uCheck['rate_limit'])
+    except TypeError:
+        uNum = 0
     if uNum < 3:
         uNum += 1
         uNum = str(uNum)
@@ -233,7 +273,7 @@ def SQL_update_card(cnum, cval, uID):
         fo.write(key)
     f = Fernet(key)
 
-    cursor.execute('SELECT * FROM card_info WHERE card_num = %s', (card_no,))
+    cursor.execute('SELECT * FROM card_info WHERE card_num = %s', (cnum,))
     dupe = cursor.fetchone()
     decrypted_card = None
     try:
