@@ -584,6 +584,7 @@ def register():
         phone = regform.phone.data
 
         if SQL_Register(username,password,email, phone) == 0:
+            # msg='Succcess'
             token = s.dumps(email, salt='email-confirm')
 
             v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
@@ -609,8 +610,8 @@ def register():
             token = s.dumps(email, salt='email-confirm')
             link = url_for('confirm_email', token=token, _external=True)
 
-            return render_template('thanks.html', username=username, password=password, email=email, link=link)
-            # return redirect(url_for('email_verification'))
+            # return render_template('thanks.html', username=username, password=password, email=email, link=link)
+            return redirect(url_for('email_verification'))
         elif SQL_Register(username, password, email, phone) == 1:
             msg = 'Error'
 
@@ -678,7 +679,7 @@ def home():
 def profile():
     if 'loggedin' in session:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT * FROM users WHERE id = %s", (session['id'],))
+        cursor.execute("SELECT * FROM users WHERE user_ID = %s", (session['id'],))
         account = cursor.fetchone()
 
         encrypted_email = account['email'].encode()
@@ -686,8 +687,8 @@ def profile():
         file = open('symmetric_user.key', 'rb')
         key = file.read()
         file.close()
-        # f = Fernet(key)
-        # decrypted_email = f.decrypt(encrypted_email)
+        f = Fernet(key)
+        decrypted_email = f.decrypt(encrypted_email)
 
         if 'google_id' in account:
             # User registered with Google account
@@ -707,7 +708,7 @@ def profile():
 
             return render_template('set_password_phone.html')
 
-        return render_template('profile.html', account=account)
+        return render_template('profile.html', account=account,decrypted_email=decrypted_email)
         # return render_template('profile.html', account=account, decrypted_email=decrypted_email)
 
     return redirect(url_for('login'))
@@ -738,7 +739,8 @@ def card():
     msg = ''
     regcard = RegisterCard()
     nList = readCards(session['id'])
-    print(nList)
+
+    # print(nList)
     if regcard.validate_on_submit():
         fname = regcard.fname.data
         lname = regcard.lname.data

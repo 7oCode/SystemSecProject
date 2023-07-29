@@ -67,11 +67,13 @@
 	<body class="loggedin">
 		<nav class="navtop">
 			<div>
-				<h1>Website Title</h1>
+				<h1>My Account</h1>
                 <a href="{{ url_for('home') }}"><i class="fas fa-home"></i>Home</a>
 				<a href="{{ url_for('profile') }}"><i class="fas fa-user-circle"></i>Profile</a>
 				<a href="{{ url_for('card') }}"><i class="fas fa-user-circle"></i>Card</a>
 				<a href="{{ url_for('update_card') }}"><i class="fas fa-user-circle"></i>Update Card</a>
+				<a href="{{ url_for('update_card') }}"><i class="fas fa-user-circle"></i>Add transaction</a>
+
 
 				<a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i>Logout</a>
 			</div>

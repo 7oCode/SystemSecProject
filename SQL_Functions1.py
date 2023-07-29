@@ -6,15 +6,28 @@ from flask import Flask, session
 from cryptography.fernet import Fernet
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
+import logging
+
+# Initialize the logging configuration
+logging.basicConfig(
+    filename='audit.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
 app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
+
+def audit_log(action, username):
+    # This function will log the action and the username to the audit.log file
+    logger.info(f"Action: {action}, Username: {username}")
 
 
 def SQL_Register(username, password, email, phone):
@@ -37,6 +50,11 @@ def SQL_Register(username, password, email, phone):
         encrypted_email = f.encrypt(email)
 
         cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0, 0)', (username, hashpwd, encrypted_email, phone,))
+        # cursor.execute('INSERT INTO users (username, password, email, phone, column1, column2) VALUES (%s, %s, %s, %s, 0, 0)',(username, hashpwd, encrypted_email, phone,))
+
+        # Log the user registration in the database
+        audit_log(action="SQL User Registration", username=username)
+
         mysql.connection.commit()
         return 0
 
@@ -72,7 +90,7 @@ def SQL_Login(username, password):
         #     session['loggedin'] = True
         #     session['id'] = userlogin['id']
         #     session['username'] = userlogin['username']'''
-    
+
     #updated for session management
     if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
         # Make the session last beyond the browser being closed
@@ -89,10 +107,20 @@ def SQL_Login(username, password):
         f = Fernet(key)
         decrypted_email = f.decrypt(encrypted_email)
         print(f"Logged in successfully with {decrypted_email.decode()}")
+
+        # Log the login attempt
+        if result == 0:
+            audit_log(action="SQL Login Success", username=username)
+        elif result == 1:
+            audit_log(action="SQL Login Failure - Incorrect Username/Password", username=username)
+        elif result == 2:
+            audit_log(action="SQL Login Failure - Account Locked", username=username)
+
         return 0
     else:
         print('Pass no match')
         return 2
+
 #login done
 
 # cvv must be encrypted
@@ -107,9 +135,8 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv, uID):
 
     f = Fernet(key)
 
-    cursor.execute('SELECT * FROM card_info WHERE user_id = %s', (uID,))
+    cursor.execute('SELECT * FROM card_info WHERE card_num = %s', (card_no,))
     dupe = cursor.fetchone()
-    print(dupe)
     decrypted_card = None
     try:
         c_num = dupe['card_num'].encode()
@@ -134,12 +161,15 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv, uID):
 
         cursor.execute('INSERT INTO card_info VALUES (NULL, %s, %s, %s, %s, 0, %s)', (fullname, encrypted_card_no, exp_date, encrypted_cvv, uID))
         mysql.connection.commit()
+
+        audit_log(action="SQL Card Registration", username=username)  # Assuming you have a 'username' variable here
+
         return 0
 
 def readCards(uID):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM card_info WHERE user_id = %s', (str(uID),))
-    cList = cursor.fetchone()
+    cList = cursor.fetchall()
     cList = list(cList)
     file = open('symmetric_card.key', 'rb')
     key = file.read()
@@ -223,19 +253,4 @@ def SQL_Check_Email(email):
         return 1
 
 def SQL_update_card(cnum, cval, uID):
-    cursor = mysql.connect.cursor(MySQLdb.cursors.DictCursor)
-    key = Fernet.generate_key()
-    cursor.execute("SELECT * FROM card_info WHERE user_id = %s", (uID,))
-
-    with open('symmetric_card.key', 'wb') as fo:
-        fo.write(key)
-    f = Fernet(key)
-
-    cursor.execute('SELECT * FROM card_info WHERE card_num = %s', (card_no,))
-    dupe = cursor.fetchone()
-    decrypted_card = None
-    try:
-        c_num = dupe['card_num'].encode()
-        decrypted_card = c_num.decode()
-    except TypeError:
-        decrypted_card = 0
+    pass
