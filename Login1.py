@@ -740,15 +740,15 @@ def card():
     regcard = RegisterCard()
     try:
         nList = readCards(str(session['id']))
-    except FileNotFoundError:
-        nList = []
+    except:
+        print(str(session[id]))
 
 
     # print(nList)
     if regcard.validate_on_submit():
         fname = regcard.fname.data
         lname = regcard.lname.data
-        userID = session['id']
+        userID = str(session['id'])
         fullname = fname + ' ' + lname
         card_num = regcard.card_num.data
         exp_date = regcard.exp_date.data
@@ -768,7 +768,7 @@ def update_card():
     if updateForm.validate_on_submit():
         card_num = updateForm.card_num.data
         card_val = updateForm.card_val.data
-        uID = session['id']
+        uID = str(session['id'])
         if SQL_update_card(card_num,card_val,uID) == 0:
             msg = 'Successful update!'
         elif SQL_update_card(card_num,card_val,uID) == 1:

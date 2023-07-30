@@ -120,7 +120,7 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv, uID):
 
     cursor.execute('SELECT * FROM card_info WHERE user_id = %s', (uID,))
     dupe = cursor.fetchone()
-    print(dupe)
+    # print(dupe)
     decrypted_card = None
     try:
         c_num = dupe['card_num'].encode()
@@ -135,14 +135,15 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv, uID):
         # mysql.connection.commit()
         cList = []
         for filename in os.listdir():
-            if filename.endswith('_card.key') and filename.__contains__(str(uID)):
+            if filename.endswith('_card.key') and filename.__contains__(uID):
                 cList.append(filename)
+        print(cList)
+
 
         n = 1
         for newcard in cList:
-            if newcard == f"{uID}_{n}.key":
-                n += 1
-
+            n += 1
+        print(n)
 
         # key = Fernet.generate_key()
         with open(f'{uID}_{n}_card.key', 'wb') as fo:
@@ -265,19 +266,45 @@ def SQL_Check_Email(email):
         return 1
 
 def SQL_update_card(cnum, cval, uID):
-    cursor = mysql.connect.cursor(MySQLdb.cursors.DictCursor)
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     key = Fernet.generate_key()
     cursor.execute("SELECT * FROM card_info WHERE user_id = %s", (uID,))
+    cardList = cursor.fetchall()
+    cardList = list(cardList)
+    cList = []
+    for filename in os.listdir():
+        if filename.endswith('_card.key') and filename.__contains__(uID):
+            cList.append(filename)
 
-    with open('symmetric_card.key', 'wb') as fo:
-        fo.write(key)
-    f = Fernet(key)
 
-    cursor.execute('SELECT * FROM card_info WHERE card_num = %s', (cnum,))
-    dupe = cursor.fetchone()
-    decrypted_card = None
-    try:
-        c_num = dupe['card_num'].encode()
-        decrypted_card = c_num.decode()
-    except TypeError:
-        decrypted_card = 0
+    for i in range(len(cardList)):
+        encrypted_card = cardList[i]['card_num'].encode()
+        for cardkey in cList:
+            file = open(cardkey, 'rb')
+            key = file.read()
+            file.close()
+            f = Fernet(key)
+            try:
+                decrypted_card = f.decrypt(encrypted_card)
+                if decrypted_card.decode() == cnum:
+                    cursor.execute("UPDATE card_info SET budget = %s WHERE card_num = %s AND user_id = %s",
+                                   (cval, cardList[i]['card_num'], uID,))
+                    mysql.connection.commit()
+                    return 0
+            except Exception as e:
+                print(f"Error: {e}")
+                return 1
+
+
+    # with open('symmetric_card.key', 'wb') as fo:
+    #     fo.write(key)
+    # f = Fernet(key)
+    #
+    # cursor.execute('SELECT * FROM card_info WHERE card_num = %s', (cnum,))
+    # dupe = cursor.fetchone()
+    # decrypted_card = None
+    # try:
+    #     c_num = dupe['card_num'].encode()
+    #     decrypted_card = c_num.decode()
+    # except TypeError:
+    #     decrypted_card = 0
