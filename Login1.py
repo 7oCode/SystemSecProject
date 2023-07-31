@@ -304,7 +304,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
+app.config['MYSQL_PASSWORD'] = 'password123'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
@@ -687,11 +687,11 @@ def profile():
         for filename in os.listdir():
             if filename.endswith('.key') and filename.__contains__(account['username']):
                 dlist.append(filename)
-                j += 1
+
         dlist.sort()
-        decrypted_email = None
+        # decrypted_email = None
         try:
-            for a in range(len(dlist)):
+            for a in dlist:
                 en_mail = account['email'].encode()
                 file = open(a, 'rb')
                 key = file.read()
