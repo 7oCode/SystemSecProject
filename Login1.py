@@ -304,7 +304,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
@@ -585,33 +585,33 @@ def register():
 
         if SQL_Register(username,password,email, phone) == 0:
             msg='Succcess'
-            # token = s.dumps(email, salt='email-confirm')
-            #
-            # v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
-            #
-            # link = url_for('confirm_email', token=token, _external=True)
-            #
-            # v_msg.body = 'To confirm your email, click the link {} . The link will expire in 3 minutes! Thank You'.format(
-            #     link)
-            #
-            # mail.send(v_msg)
-            #
-            # session['username'] = username
-            # session['password'] = password
-            # session['email'] = email
-            #
-            # # phone = regform.phone.data  # Get the phone data from the form
-            # session['phone'] = phone
-            #
-            # # Validate the password using password_check()
-            # password_validation = password_check(password)
-            # print(password_validation)
-            # print(password)
-            # token = s.dumps(email, salt='email-confirm')
-            # link = url_for('confirm_email', token=token, _external=True)
-            #
-            # # return render_template('thanks.html', username=username, password=password, email=email, link=link)
-            # return redirect(url_for('email_verification'))
+            token = s.dumps(email, salt='email-confirm')
+
+            v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
+
+            link = url_for('confirm_email', token=token, _external=True)
+
+            v_msg.body = 'To confirm your email, click the link {} . The link will expire in 3 minutes! Thank You'.format(
+                link)
+
+            mail.send(v_msg)
+
+            session['username'] = username
+            session['password'] = password
+            session['email'] = email
+
+            # phone = regform.phone.data  # Get the phone data from the form
+            session['phone'] = phone
+
+            # Validate the password using password_check()
+            password_validation = password_check(password)
+            print(password_validation)
+            print(password)
+            token = s.dumps(email, salt='email-confirm')
+            link = url_for('confirm_email', token=token, _external=True)
+
+            # return render_template('thanks.html', username=username, password=password, email=email, link=link)
+            return redirect(url_for('email_verification'))
         elif SQL_Register(username, password, email, phone) == 1:
             msg = 'Error'
 
@@ -657,82 +657,53 @@ def home():
     return redirect(url_for('login'))
 
 
-# @app.route('/profile')
-# def profile():
-#     if 'loggedin' in session:
-#         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-#         cursor.execute("SELECT * FROM users WHERE id = %s", (session['id'],))
-#         account = cursor.fetchone()
-#
-#         encrypted_email = account['email'].encode()
-#
-#         file = open('symmetric_user.key', 'rb')
-#         key = file.read()
-#         file.close()
-#         f = Fernet(key)
-#         decrypted_email = f.decrypt(encrypted_email)
-#
-#         return render_template('profile.html', account=account, decrypted_email=decrypted_email)
-#     return redirect(url_for('login'))
-
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile')
 def profile():
     if 'loggedin' in session:
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT * FROM users WHERE user_ID = %s", (session['id'],))
+        cursor.execute("SELECT * FROM users WHERE user_id = %s", (session['id'],))
         account = cursor.fetchone()
+        print(account)
+        plist = []
+        j = 0
+        for filename in os.listdir():
+            if filename.endswith('.key') and filename.__contains__(account['username']):
+                plist.append(filename)
+        plist.sort()
 
-        encrypted_email = account['email'].encode()
+        dlist = []
+        # assuming I have a file
+        try:
+            for i in range(len(account)):
+                encrypted_email = account[i]['email'].encode()
 
-        file = open('symmetric_user.key', 'rb')
-        key = file.read()
-        file.close()
-        f = Fernet(key)
-        decrypted_email = f.decrypt(encrypted_email)
+                for d in plist:
+                    file = open(d, 'rb')
+                    key = file.read()
+                    file.close()
+                    f = Fernet(key)
+                    try:
+                        decrypted_email = f.decrypt(encrypted_email)
+                        plist[i]['email'] = decrypted_email.decode()
+                    except:
+                        continue
+        except:
+            decrypted_email = account['email']
 
-        if 'google_id' in account:
-            # User registered with Google account
-            if request.method == 'POST':
-                password = request.form.get('password')
-                phone = request.form.get('phone')
 
-                # Validate the password using password_check()
-                password_validation = password_check(password)
 
-                if password_validation['password_ok']:
-                    # Update the user's password and phone number in the database
-                    SQL_UpdatePasswordAndPhone(session['id'], password, phone)
-                    return redirect(url_for('home'))
-                else:
-                    msg = 'Invalid password. Please make sure your password meets the requirements.'
 
-            return render_template('set_password_phone.html')
+        # encrypted_email = account['email'].encode()
+        #
+        # file = open('symmetric_user.key', 'rb')
+        # key = file.read()
+        # file.close()
+        # f = Fernet(key)
+        # decrypted_email = f.decrypt(encrypted_email)
 
-        return render_template('profile.html', account=account,decrypted_email=decrypted_email)
-        # return render_template('profile.html', account=account, decrypted_email=decrypted_email)
-
+        return render_template('profile.html', account=account, decrypted_email=decrypted_email)
     return redirect(url_for('login'))
 
-@app.route('/set_password_phone', methods=['GET', 'POST'])
-def set_password_phone():
-    if 'loggedin' in session:
-        if 'google_id' in session:
-            if request.method == 'POST':
-                password = request.form.get('password')
-                phone = request.form.get('phone')
-
-                # Validate the password using password_check()
-                password_validation = password_check(password)
-
-                if password_validation['password_ok']:
-                    # Update the user's password and phone number in the database
-                    SQL_UpdatePasswordAndPhone(session['id'], password, phone)
-                    return redirect(url_for('home'))
-                else:
-                    msg = 'Invalid password. Please make sure your password meets the requirements.'
-
-            return render_template('set_password_phone.html')
-    return redirect(url_for('login'))
 
 @app.route('/card', methods=['GET', 'POST'])
 def card():
@@ -783,28 +754,6 @@ def google_login():
     session["state"] = state
     return redirect(authorization_url)
 
-# @app.route("/callback")
-# def callback():
-#     flow.fetch_token(authorization_response=request.url)
-#
-#     if not session["state"] == request.args["state"]:
-#         abort(500)  # State does not match!
-#
-#     credentials = flow.credentials
-#     request_session = requests.session()
-#     cached_session = cachecontrol.CacheControl(request_session)
-#     token_request = google.auth.transport.requests.Request(session=cached_session)
-#
-#     id_info = id_token.verify_oauth2_token(
-#         id_token=credentials._id_token,
-#         request=token_request,
-#         audience=GOOGLE_CLIENT_ID
-#     )
-#
-#     session["google_id"] = id_info.get("sub")
-#     session["name"] = id_info.get("name")
-#     return redirect("/protected_area")
-
 @app.route("/callback")
 def callback():
     flow.fetch_token(authorization_response=request.url)
@@ -831,11 +780,12 @@ def callback():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT * FROM users WHERE google_id = %s", (google_id,))
     user = cursor.fetchone()
+    print(user)
 
-    if user:
+    if type(user['google_id']) != None:
         # User is already registered, set session and redirect
         session["loggedin"] = True
-        session["id"] = user["id"]
+        session["id"] = user["user_ID"]
         session["username"] = user["username"]
         return redirect(url_for("home"))
     else:
@@ -858,12 +808,6 @@ def SQL_RegisterGoogleUser(google_id, name, email, phone):
     mysql.connection.commit()
     cursor.close()
 
-
-def SQL_UpdatePasswordAndPhone(user_id, password, phone):
-    cursor = mysql.connection.cursor()
-    cursor.execute("UPDATE users SET password = %s, phone_no = %s WHERE id = %s", (password, phone, user_id))
-    mysql.connection.commit()
-    cursor.close()
 
 @app.route("/protected_area")
 @login_is_required
