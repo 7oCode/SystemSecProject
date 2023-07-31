@@ -84,3 +84,59 @@ cryptography.fernet.InvalidToken
 2023-07-29 12:31:58,270 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on http://127.0.0.1:5000
 2023-07-29 12:31:58,270 - INFO - [33mPress CTRL+C to quit[0m
+2023-07-31 08:33:08,135 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2023-07-31 08:33:08,135 - INFO - [33mPress CTRL+C to quit[0m
+2023-07-31 09:12:23,035 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2023-07-31 09:12:23,035 - INFO - [33mPress CTRL+C to quit[0m
+2023-07-31 09:12:23,035 - INFO -  * Restarting with stat
+2023-07-31 09:12:24,415 - WARNING -  * Debugger is active!
+2023-07-31 09:12:24,415 - INFO -  * Debugger PIN: 143-189-243
+2023-07-31 09:12:30,525 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2023-07-31 09:12:30,525 - INFO - [33mPress CTRL+C to quit[0m
+2023-07-31 09:12:30,525 - INFO -  * Restarting with stat
+2023-07-31 09:12:31,825 - WARNING -  * Debugger is active!
+2023-07-31 09:12:31,825 - INFO -  * Debugger PIN: 143-189-243
+2023-07-31 09:12:50,665 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2023-07-31 09:12:50,665 - INFO - [33mPress CTRL+C to quit[0m
+2023-07-31 09:12:57,105 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2023-07-31 09:12:57,105 - INFO - [33mPress CTRL+C to quit[0m
+2023-07-31 09:12:57,105 - INFO -  * Restarting with stat
+2023-07-31 09:12:58,475 - WARNING -  * Debugger is active!
+2023-07-31 09:12:58,475 - INFO -  * Debugger PIN: 143-189-243
+2023-07-31 09:13:21,760 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2023-07-31 09:13:21,760 - INFO - [33mPress CTRL+C to quit[0m
+2023-07-31 09:13:21,760 - INFO -  * Restarting with stat
+2023-07-31 09:13:23,164 - WARNING -  * Debugger is active!
+2023-07-31 09:13:23,179 - INFO -  * Debugger PIN: 143-189-243
+2023-07-31 09:13:24,783 - INFO - 127.0.0.1 - - [31/Jul/2023 09:13:24] "[32mGET / HTTP/1.1[0m" 302 -
+2023-07-31 09:13:24,868 - INFO - 127.0.0.1 - - [31/Jul/2023 09:13:24] "GET /WebApp HTTP/1.1" 200 -
+2023-07-31 09:13:25,222 - INFO - 127.0.0.1 - - [31/Jul/2023 09:13:25] "GET /static/style.css HTTP/1.1" 200 -
+2023-07-31 09:13:25,316 - INFO - 127.0.0.1 - - [31/Jul/2023 09:13:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2023-07-31 09:17:36,342 - INFO -  * Detected change in 'C:\\Users\\O_Student\\Desktop\\Modules\\IT1666 App Development Project\\newP\\updated_login.py', reloading
+2023-07-31 09:17:36,537 - INFO -  * Restarting with stat
+2023-07-31 09:17:38,202 - WARNING -  * Debugger is active!
+2023-07-31 09:17:38,202 - INFO -  * Debugger PIN: 143-189-243
+2023-07-31 09:20:11,231 - INFO -  * Detected change in 'C:\\Users\\O_Student\\Desktop\\Modules\\IT1666 App Development Project\\newP\\SQL_Functions2.py', reloading
+2023-07-31 09:20:11,452 - INFO -  * Restarting with stat
+2023-07-31 09:20:13,311 - WARNING -  * Debugger is active!
+2023-07-31 09:20:13,321 - INFO -  * Debugger PIN: 143-189-243
+2023-07-31 09:29:42,905 - INFO -  * Detected change in 'C:\\Users\\O_Student\\Desktop\\Modules\\IT1666 App Development Project\\newP\\test.py', reloading
+2023-07-31 09:29:43,200 - INFO -  * Restarting with stat
+2023-07-31 09:29:45,240 - WARNING -  * Debugger is active!
+2023-07-31 09:29:45,245 - INFO -  * Debugger PIN: 143-189-243
+2023-07-31 09:34:27,316 - INFO -  * Detected change in 'C:\\Users\\O_Student\\Desktop\\Modules\\IT1666 App Development Project\\newP\\SQL_Functions.py', reloading
+2023-07-31 09:34:27,556 - INFO -  * Restarting with stat
+2023-07-31 09:34:29,186 - WARNING -  * Debugger is active!
+2023-07-31 09:34:29,196 - INFO -  * Debugger PIN: 143-189-243
+2023-07-31 09:35:51,976 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2023-07-31 09:35:51,976 - INFO - [33mPress CTRL+C to quit[0m
+2023-07-31 09:35:51,986 - INFO -  * Restarting with stat
+2023-07-31 09:35:53,336 - WARNING -  * Debugger is active!
+2023-07-31 09:35:53,347 - INFO -  * Debugger PIN: 143-189-243

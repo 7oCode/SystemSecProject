@@ -2,18 +2,17 @@ import os
 
 import MySQLdb.cursors
 
+import logging
+
 from Login1 import *
 from flask_mysqldb import MySQL
 from flask import Flask, session
 from cryptography.fernet import Fernet
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
-s = URLSafeTimedSerializer('Thisisasecret!')
-
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -22,35 +21,47 @@ app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
 
 
+# Create a logger for audit logging
+audit_logger = logging.getLogger('audit_logger')
+audit_logger.setLevel(logging.INFO)
+
+# Define a file handler to write audit logs to a file
+audit_file_handler = logging.FileHandler('audit_log.txt')
+audit_file_handler.setLevel(logging.INFO)
+
+# Define a formatter to specify the log format
+audit_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+# Set the formatter for the file handler
+audit_file_handler.setFormatter(audit_formatter)
+
+# Add the file handler to the logger
+audit_logger.addHandler(audit_file_handler)
+
+
+def log_audit(action, username, ip_address, endpoint, http_method, status, exception=None):
+    """
+    Helper function to log audit events.
+    :action: The sensitive action being logged (e.g., "User Authentication", "Data Modification", etc.).
+    :username: The username or user ID of the user performing the action.
+    :ip_address: The IP address from which the action is performed.
+    :endpoint: The URL endpoint where the action is performed.
+    :http_method: The HTTP method used for the request (e.g., GET, POST, etc.).
+    :status: The success/failure status of the action (e.g., "Success" or "Failure").
+    :exception: If the action resulted in an error or exception, provide details here.
+    """
+    log_message = f"{action} - Username: {username} - IP: {ip_address} - Endpoint: {endpoint} - HTTP Method: {http_method} - Status: {status}"
+    if exception:
+        log_message += f" - Exception: {exception}"
+    audit_logger.info(log_message)
+
+
 def SQL_Register(username, password, email, phone):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM users WHERE username = %s', (username,))
     dupe = cursor.fetchone()
-    cursor.execute("SELECT email FROM users")
-    eList = cursor.fetchall()
-    eList = list(eList)
-    dList = []
-    for filename in os.listdir():
-        if filename.endswith('.key') and filename.__contains__(username):
-            dList.append(filename)
-
-    dList.sort()
-    for i in range(len(eList)):
-        en_email = eList[i]['email'].encode()
-        for d in dList:
-            file = open(d,'rb')
-            key = file.read()
-            file.close()
-            f = Fernet(key)
-            try:
-                de_email = f.decrypt(en_email)
-                eList[i]['email'] = de_email.decode()
-            except:
-                continue
-
-
     print(dupe)
-    if dupe or (username in eList):
+    if dupe:
         return 1
     else:
         hashpwd = bcrypt.generate_password_hash(password)
@@ -69,6 +80,8 @@ def SQL_Register(username, password, email, phone):
 
         cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0, 0)', (username, hashpwd, encrypted_email, phone,))
         # cursor.execute('INSERT INTO users (username, password, email, phone, column1, column2) VALUES (%s, %s, %s, %s, 0, 0)',(username, hashpwd, encrypted_email, phone,))
+
+        log_audit("User Registration", username, ip_address, endpoint, http_method, "Success")
 
         mysql.connection.commit()
         return 0
@@ -106,7 +119,7 @@ def SQL_Login(username, password):
         #     session['loggedin'] = True
         #     session['id'] = userlogin['id']
         #     session['username'] = userlogin['username']'''
-    
+
     #updated for session management
     if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
         # Make the session last beyond the browser being closed
@@ -202,6 +215,7 @@ def readCards(uID):
         if filename.endswith('_card.key') and filename.__contains__(str(uID)):
             dList.append(filename)
     dList.sort()
+    j = 0
     # for a in os.listdir():
     for i in range(len(cList)):
         encrypted_card = cList[i]['card_num'].encode()
@@ -267,40 +281,7 @@ def SQL_rate_limit_user(username):
 
 def SQL_Check_Email(email):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT * FROM users")
-    eList = cursor.fetchall()
-    eList = list(eList)
-    dList = []
-    d = 0
-    for filename in os.listdir():
-
-        if filename.endswith('.key') and filename.__contains__(eList[d]['username']):
-            dList.append(filename)
-        d += 1
-    dList.sort()
-    pList = []
-    ddList = []
-    for i in range(len(eList)):
-        pList.append(eList[i]['email'])
-        en_email = eList[i]['email'].encode()
-        for d in dList:
-            file = open(d,'rb')
-            key = file.read()
-            file.close()
-            f = Fernet(key)
-            try:
-                de_email = f.decrypt(en_email)
-                eList[i]['email'] = de_email.decode()
-                ddList.append(eList[i]['email'])
-            except:
-                continue
-    print(pList)
-    print(ddList)
-    for g in range(len(ddList)):
-        if email == ddList[g]:
-            email = ddList[g]
-            break
-    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+    cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
     user = cursor.fetchone()
     cursor.close()
 
@@ -311,14 +292,14 @@ def SQL_Check_Email(email):
 
         # Create a message with the verification link and send it via email
         v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])  # Replace with your Gmail email
-        link = url_for('confirm_email1', token=token, _external=True)
+        # link = url_for('confirm_email1', token=token, _external=True)
         v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
         mail.send(v_msg)
 
         # Store the email in the session for further processing
         session['email'] = email
 
-        return 0
+        return True
     else:
         # Email does not exist in the database
         return 1
@@ -354,20 +335,15 @@ def SQL_update_card(cnum, cval, uID):
                 return 1
 
 
-def SQL_RegisterGoogleUser(google_id, name, email, phone):
-    cursor = mysql.connection.cursor()
-    cursor.execute("INSERT INTO users (google_id, username, password, email, phone_no) VALUES (%s, %s, %s, %s, %s)",
-                   (google_id, name, "", email, phone))
-    mysql.connection.commit()
-    cursor.close()
-
-
-def SQL_UpdatePasswordAndPhone(user_id, password, phone):
-    cursor = mysql.connection.cursor()
-    hashpwd = bcrypt.generate_password_hash(password)
-    cursor.execute("UPDATE users SET password = %s, phone_no = %s WHERE id = %s", (hashpwd, phone, user_id))
-    mysql.connection.commit()
-    cursor.close()
-
-def SQL_Update_Password(email,npass):
-    pass
+    # with open('symmetric_card.key', 'wb') as fo:
+    #     fo.write(key)
+    # f = Fernet(key)
+    #
+    # cursor.execute('SELECT * FROM card_info WHERE card_num = %s', (cnum,))
+    # dupe = cursor.fetchone()
+    # decrypted_card = None
+    # try:
+    #     c_num = dupe['card_num'].encode()
+    #     decrypted_card = c_num.decode()
+    # except TypeError:
+    #     decrypted_card = 0

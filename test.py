@@ -62,5 +62,9 @@ mysql = MySQL(app)
 # a.items()
 nlist = [{'card_ID': 30, 'fullname': 'Jeff Card', 'card_num': 'gAAAAABkxaN6EWad8cBovvPjWv92qB4-xTKQLD1nkkrMsE-qUSD28BnAHPfxO81Jyy62txzPFka47EZjFr7zwcv65GB7JOgNcLWCmYT9T2_mICpT3J-DwT0=', 'exp_date': '2025/11', 'cvv': 'gAAAAABkxaN65szVgq4hUqYRnmTK9APagIaWsQWhpdBzsobcMEpS5mlkkCsEgwOCcrZn0HG7TUrqTyKwnipWLvZQDqH_sMxobg==', 'budget': '0', 'user_id': '55'}, {'card_ID': 31, 'fullname': 'Jeff Neww', 'card_num': 'gAAAAABkxaOOQIUYojZa7avISszkZwJfRqjqxTZLdtB4aNY2v9Yp0AmHFXTAAfNxjBfX7M2iFgILQ4i0d_2qXOAbosGWPpBr6YgRkadehxSJA2Jo6HG1Qxc=', 'exp_date': '2025/05', 'cvv': 'gAAAAABkxaOON6Ot_6vNdtd9XSI4203I0VB3FQe_EgpaQ2ScYhvrWMspadCcrqc5a5E4QS--LyKlIp9P2pvX3mJT_2CagJrKHg==', 'budget': '0', 'user_id': '55'}]
 clist = []
-for cardkey in nlist:
-    pass
+for i in range(3):
+    print(i)
+    for l in 'abcd':
+        if l == 'b':
+            break
+        print(l)
