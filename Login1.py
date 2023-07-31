@@ -681,34 +681,52 @@ def profile():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM users WHERE user_ID = %s", (session['id'],))
         account = cursor.fetchone()
+        dlist = []
+        j = 0
+        print(account)
+        for filename in os.listdir():
+            if filename.endswith('.key') and filename.__contains__(account['username']):
+                dlist.append(filename)
+                j += 1
+        dlist.sort()
+        decrypted_email = None
+        try:
+            for a in range(len(dlist)):
+                en_mail = account['email'].encode()
+                file = open(a, 'rb')
+                key = file.read()
+                file.close()
+                f = Fernet(key)
+                decrypted_email = f.decrypt(en_mail)
+                account['email'] = decrypted_email.decode()
+        except Exception as e:
+            print(f"Error {e}")
+        else:
+            decrypted_email = account['email']
 
-        encrypted_email = account['email'].encode()
 
-        file = open('symmetric_user.key', 'rb')
-        key = file.read()
-        file.close()
-        f = Fernet(key)
-        decrypted_email = f.decrypt(encrypted_email)
 
-        if 'google_id' in account:
-            # User registered with Google account
-            if request.method == 'POST':
-                password = request.form.get('password')
-                phone = request.form.get('phone')
 
-                # Validate the password using password_check()
-                password_validation = password_check(password)
 
-                if password_validation['password_ok']:
-                    # Update the user's password and phone number in the database
-                    SQL_UpdatePasswordAndPhone(session['id'], password, phone)
-                    return redirect(url_for('home'))
-                else:
-                    msg = 'Invalid password. Please make sure your password meets the requirements.'
+        # if 'google_id' in account:
+        #     # User registered with Google account
+        #     if request.method == 'POST':
+        #         password = request.form.get('password')
+        #         phone = request.form.get('phone')
+        #
+        #         # Validate the password using password_check()
+        #         password_validation = password_check(password)
+        #
+        #         if password_validation['password_ok']:
+        #             # Update the user's password and phone number in the database
+        #             SQL_UpdatePasswordAndPhone(session['id'], password, phone)
+        #             return redirect(url_for('home'))
+        #         else:
+        #             msg = 'Invalid password. Please make sure your password meets the requirements.'
+        #
+        #     return render_template('set_password_phone.html')
 
-            return render_template('set_password_phone.html')
-
-        return render_template('profile.html', account=account,decrypted_email=decrypted_email)
+        return render_template('profile.html', account=account, decrypted_email=decrypted_email)
         # return render_template('profile.html', account=account, decrypted_email=decrypted_email)
 
     return redirect(url_for('login'))
@@ -835,7 +853,7 @@ def callback():
     if user:
         # User is already registered, set session and redirect
         session["loggedin"] = True
-        session["id"] = user["id"]
+        session["id"] = user["user_ID"]
         session["username"] = user["username"]
         return redirect(url_for("home"))
     else:
