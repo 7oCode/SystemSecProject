@@ -49,4 +49,7 @@ class forgetPassword(FlaskForm):
     email = StringField('email', validators=[InputRequired('Email Required'),
                                            Length(min=4, max=20), Regexp(r'^(?!.*@mymail\.nyp\.edu\.sg).*@.*$')],render_kw={"placeholder": "Email"})
 
+class changePassword(FlaskForm):
+    password = StringField('password', validators=[InputRequired('New password Required'), Length(min=8, max=20)], render_kw={'placeholder': 'New Password'})
+
 
