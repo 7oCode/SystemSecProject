@@ -323,7 +323,7 @@ mail = Mail(app)
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-GOOGLE_CLIENT_ID = "887500220265-7jfh5ag7k8n3mlv37a9j0j8io817rbqo.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = "20330302842-fgs38hbba4b63hmangsgbhdr5eg378fd.apps.googleusercontent.com"
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
 flow = Flow.from_client_secrets_file(
@@ -340,6 +340,7 @@ def login_is_required(function):
             return function()
 
     return wrapper
+
 #End
 
 
@@ -445,6 +446,10 @@ def login():
                 print(f"{username}, {password}")
             elif u == 2:
                 msg = 'Account has been locked'
+
+        authorization_url, state = flow.authorization_url()
+        session["state"] = state
+        return redirect(authorization_url)
 
     # elif request.method == 'POST':
     #     msg = 'Incorrect Username/Password2'
@@ -801,27 +806,6 @@ def google_login():
     session["state"] = state
     return redirect(authorization_url)
 
-# @app.route("/callback")
-# def callback():
-#     flow.fetch_token(authorization_response=request.url)
-#
-#     if not session["state"] == request.args["state"]:
-#         abort(500)  # State does not match!
-#
-#     credentials = flow.credentials
-#     request_session = requests.session()
-#     cached_session = cachecontrol.CacheControl(request_session)
-#     token_request = google.auth.transport.requests.Request(session=cached_session)
-#
-#     id_info = id_token.verify_oauth2_token(
-#         id_token=credentials._id_token,
-#         request=token_request,
-#         audience=GOOGLE_CLIENT_ID
-#     )
-#
-#     session["google_id"] = id_info.get("sub")
-#     session["name"] = id_info.get("name")
-#     return redirect("/protected_area")
 
 @app.route("/callback")
 def callback():
@@ -865,7 +849,7 @@ def callback():
         cursor.execute("SELECT * FROM users WHERE google_id = %s", (google_id,))
         new_user = cursor.fetchone()
         session["loggedin"] = True
-        session["id"] = new_user["id"]
+        session["id"] = new_user["user_ID"]
         session["username"] = new_user["username"]
         return redirect(url_for("profile"))
 
@@ -886,7 +870,7 @@ def SQL_UpdatePasswordAndPhone(user_id, password, phone):
 @app.route("/protected_area")
 @login_is_required
 def protected_area():
-    return render_template('home.html')
+    return render_template('protected_area.html')
 #END
 
 
