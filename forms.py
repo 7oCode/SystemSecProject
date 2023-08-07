@@ -6,7 +6,7 @@ class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired('Username required'),
                                                    Length(min=5, max=10, message='5-10 characters')],render_kw={"placeholder": "Username"})
 
-    password = PasswordField('password', validators=[InputRequired('Password required'),
+    password = PasswordField('password', validators=[InputRequired('Password required'),Regexp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$"),
                                                      Length(min=8, max=20, message='At least 8 characters')],render_kw={"placeholder": "Password"})
 
 

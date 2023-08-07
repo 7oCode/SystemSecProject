@@ -85,22 +85,21 @@ def SQL_Login(username, password):
     try:
         user_hashpwd = userlogin['password']
     except TypeError:
-            # d = 'Default'
-            # d_s = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            # d_s.execute("SELECT * FROM users WHERE username = %s", (d,))
-            # d_check = d_s.fetchone()
-            # d_num = int(d_check['rate_limit'])
-            # if d_num < 3:
-            #     d_num += 1
-            #     print(d_num)
-            #     d_s.execute("UPDATE users SET rate_limit = %s WHERE username = %s", (str(d_num), d,))
-            #     return 1
-            # else:
-            #     d_s.execute("UPDATE users SET rate_limit = '0' WHERE username = %s", (d,))
-            #     return 2
-        print("Pass not found?")
-        return 2
-
+        print("TypeError Login")
+# '''
+#             d = 'Default'
+#             d_s = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#             d_s.execute("SELECT * FROM users WHERE username = %s", (d,))
+#             d_check = d_s.fetchone()
+#             d_num = int(d_check['rate_limit'])
+#             if d_num < 3:
+#                 d_num += 1
+#                 d_s.execute("UPDATE users SET rate_limit = %s WHERE username = %s", (str(d_num), d,))
+#                 return 1
+#             else:
+#                 d_s.execute("UPDATE users SET rate_limit = '0' WHERE username = %s", (d,))
+#                 return 2
+# '''
         # '''if userlogin and bcrypt.check_password_hash(user_hashpwd, password):
         #     #Create session data, data can be accessed in other routes
         #     session['loggedin'] = True
@@ -222,13 +221,15 @@ def readCards(uID):
 def SQL_rate_limit_def():
     d = 'Default'
     d_s = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    d_s.execute("SELECT * FROM users WHERE username = %s", (d,))
+    d_s.execute("SELECT rate_limit FROM users WHERE username = %s", (d,))
     d_check = d_s.fetchone()
+    print(d_check)
     d_num = int(d_check['rate_limit'])
+
     if d_num < 3:
         d_num += 1
         ds = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        ds.execute("UPDATE users SET rate_limit = %s WHERE username = %s", (d_num, d,))
+        ds.execute("UPDATE users SET rate_limit = %s WHERE username = %s", (str(d_num), d,))
         ds.execute("SELECT * FROM users WHERE username = %s", (d,))
         nCheck = ds.fetchone()
         mysql.connection.commit()
@@ -256,12 +257,10 @@ def SQL_rate_limit_user(username):
         uS.execute("SELECT * FROM users WHERE username = %s", (username,))
         uCheck = uS.fetchone()
         mysql.connection.commit()
-        print(uCheck)
         return 1
     else:
         cursor.execute("UPDATE users SET rate_limit = '0' WHERE username = %s", (username,))
         mysql.connection.commit()
-        print('Return 2')
         return 2
 
 
@@ -346,12 +345,12 @@ def SQL_update_card(cnum, cval, uID):
                 decrypted_card = f.decrypt(encrypted_card)
                 if decrypted_card.decode() == cnum:
                     cursor.execute("UPDATE card_info SET budget = %s WHERE card_num = %s AND user_id = %s",
-                                   (cval, cardList[i]['card_num'], uID,))
+                                   (cval, str(cardList[i]['card_num']), uID,))
                     mysql.connection.commit()
                     return 0
             except Exception as e:
                 print(f"Error: {e}")
-                return 1
+                continue
 
 
 def SQL_RegisterGoogleUser(google_id, name, email, phone):
