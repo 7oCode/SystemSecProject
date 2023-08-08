@@ -137,20 +137,22 @@ def homepage():
 
 LOCKOUT_DURATION = 30  # Lockout duration in seconds
 
+cnum = 0
 @app.route('/fail', methods=['GET', 'POST'])
 def failpage():
-    # if session.get('locked_out'):
-    #     lockout_time = session['locked_out']
-    #     current_time = time.time()
-    #     if current_time - lockout_time <= LOCKOUT_DURATION:
-    #         remaining_time = int(LOCKOUT_DURATION - (current_time - lockout_time))
-    #         print(f"This page is locked. Please try again in {remaining_time} seconds.")
-    #     else:
-    #         session.pop('locked_out', None)
-    #     return redirect(url_for('login'))
+    remaining_time = 0
+    if session.get('locked_out'):
+        lockout_time = session['locked_out']
+        current_time = time.time()
+        if current_time - lockout_time <= LOCKOUT_DURATION:
+            remaining_time = int(LOCKOUT_DURATION - (current_time - lockout_time))
+            return render_template('wait.html', remaining_time=remaining_time)
+        else:
+            session.pop('locked_out', None)
+        return redirect(url_for('login'))
 
+    return render_template('wait.html', remaining_time=remaining_time)
 
-    return render_template('stop.html')
 
 
 @app.route('/WebApp', methods=['GET', 'POST'])
@@ -164,8 +166,9 @@ def login():
         # Validate the password using password_check()
         # password_validation = password_check(password)
 #  and password_validation['password_ok']
-        print(SQL_Login(username,password))
+#         print(SQL_Login(username,password))
         if SQL_Login(username, password) == 0:
+            # super important don't remove
             # Generate OTP and store it in the session
             # otp = str(randint(100000, 999999))
             # session['otp'] = otp
@@ -195,6 +198,7 @@ def login():
                 msg = 'Incorrect Username/Password(d)'
                 print(f"{username}, {password}")
             elif a == 2:
+                session['locked_out'] = time.time()
                 return redirect(url_for('failpage'))
         elif SQL_Login(username, password) == 2:
             u = SQL_rate_limit_user(username)
@@ -203,7 +207,6 @@ def login():
                 print(f"{username}, {password}")
             elif u == 2:
                 return redirect(url_for('forget'))
-        print(f'{SQL_rate_limit_def()}')
 
         # authorization_url, state = flow.authorization_url()
         # session["state"] = state

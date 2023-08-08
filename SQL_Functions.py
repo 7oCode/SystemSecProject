@@ -85,7 +85,8 @@ def SQL_Login(username, password):
     try:
         user_hashpwd = userlogin['password']
     except TypeError:
-        print("TypeError Login")
+        # print("TypeError Login")
+        return 1
 # '''
 #             d = 'Default'
 #             d_s = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -223,17 +224,18 @@ def SQL_rate_limit_def():
     d_s = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     d_s.execute("SELECT rate_limit FROM users WHERE username = %s", (d,))
     d_check = d_s.fetchone()
-    print(d_check)
+    # print(d_check)
     d_num = int(d_check['rate_limit'])
 
-    if d_num < 3:
+    if d_num < 2:
         d_num += 1
         ds = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         ds.execute("UPDATE users SET rate_limit = %s WHERE username = %s", (str(d_num), d,))
-        ds.execute("SELECT * FROM users WHERE username = %s", (d,))
+        ds.execute("SELECT rate_limit FROM users WHERE username = %s", (d,))
         nCheck = ds.fetchone()
         mysql.connection.commit()
         print(nCheck)
+        print('return 1')
         return 1
     else:
         d_s.execute("UPDATE users SET rate_limit = '0' WHERE username = %s", (d,))
@@ -249,7 +251,7 @@ def SQL_rate_limit_user(username):
         uNum = int(uCheck['rate_limit'])
     except TypeError:
         uNum = 0
-    if uNum < 3:
+    if uNum < 2:
         uNum += 1
         uNum = str(uNum)
         uS = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
