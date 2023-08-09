@@ -159,6 +159,12 @@ def failpage():
 def login():
     msg = ''
     login = LoginForm()
+    try:
+        if session['locked_out'] is True:
+            return redirect(url_for('failpage'))
+    except:
+        print("All good")
+
     if login.validate_on_submit():
         username = login.username.data
         password = login.password.data
@@ -234,11 +240,26 @@ def forget():
     forgetForm = forgetPassword()
     if forgetForm.validate_on_submit():
         email = forgetForm.email.data
-        if SQL_Check_Email(email) == 0:
-            msg = 'Email sent to user'
+        user = forgetForm.username.data
+        # print(SQL_Check_Email(email, user))
+        if SQL_Check_Email(email, user) == 0:
+            # msg = 'Email sent to user'
+            # Email exists in the database
+            # Generate a time-limited token for email verification
+            # token = s.dumps(email, salt='email-confirm')
+            #
+            # # Create a message with the verification link and send it via email
+            # v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com',
+            #                 recipients=[email])  # Replace with your Gmail email
             # link = url_for('confirm_email1', token=token, _external=True)
+            # v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
+            # mail.send(v_msg)
+            #
+            # # Store the email in the session for further processing
+            # session['email'] = email
+            return redirect(url_for('changepassword'))
 
-        elif SQL_Check_Email(email) == 1:
+        elif SQL_Check_Email(email,user) == 1:
             msg = 'Error'
     # if request.method == 'POST':
     #     email = request.form['email']
@@ -267,7 +288,10 @@ def forget():
 
 @app.route('/changepassword')
 def changepassword():
-    return render_template('changepassword.html')
+    msg = ''
+    changePW = changePassword()
+
+    return render_template('changepassword.html', form=changePW)
 
 @app.route('/confirm_email1/<token>')
 def confirm_email1(token):

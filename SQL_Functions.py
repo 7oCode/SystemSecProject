@@ -266,59 +266,70 @@ def SQL_rate_limit_user(username):
         return 2
 
 
-def SQL_Check_Email(email):
+def SQL_Check_Email(email,euser):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT * FROM users")
-    eList = cursor.fetchall()
-    eList = list(eList)
+    cursor.execute("SELECT * FROM users where username = %s", (euser,))
+    eList = cursor.fetchone()
+    # eList = list(eList)
+    print(eList)
     dList = []
-    d = 0
+    # d = 0
     for filename in os.listdir():
-
-        if filename.endswith('.key') and filename.__contains__(eList[d]['username']):
+        if filename.endswith('.key') and filename.__contains__(euser):
             dList.append(filename)
-        d += 1
+        # d += 1
+
     dList.sort()
+    print(dList)
     pList = []
     ddList = []
-    for i in range(len(eList)):
-        pList.append(eList[i]['email'])
-        en_email = eList[i]['email'].encode()
-        for d in dList:
-            file = open(d,'rb')
-            key = file.read()
-            file.close()
-            f = Fernet(key)
-            try:
-                de_email = f.decrypt(en_email)
-                eList[i]['email'] = de_email.decode()
-                ddList.append(eList[i]['email'])
-            except:
-                continue
-    print(pList)
-    print(ddList)
-    for g in range(len(ddList)):
-        if email == ddList[g]:
-            email = ddList[g]
-            break
-    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-    user = cursor.fetchone()
-    cursor.close()
+    # for i in range(len(eList)):
+    #     pList.append(eList['email'])
 
-    if user:
-        # Email exists in the database
-        # Generate a time-limited token for email verification
-        token = s.dumps(email, salt='email-confirm')
+    #     for d in dList:
+    #         file = open(d,'rb')
+    #         key = file.read()
+    #         file.close()
+    #         f = Fernet(key)
+    #         try:
+    #             de_email = f.decrypt(en_email)
+    #             eList[i]['email'] = de_email.decode()
+    #             ddList.append(eList[i]['email'])
+    #         except:
+    #             continue
+    en_email = eList['email'].encode()
+    file = open(f'{euser}.key', "rb")
+    key = file.read()
+    file.close()
+    f=Fernet(key)
+    try:
+        pe_email = eList['email']
+        de_email = f.decrypt((en_email))
+        eList['email'] = de_email.decode()
+    except:
+        return 1
 
-        # Create a message with the verification link and send it via email
-        v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])  # Replace with your Gmail email
-        link = url_for('confirm_email1', token=token, _external=True)
-        v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
-        mail.send(v_msg)
+    print(eList)
 
-        # Store the email in the session for further processing
-        session['email'] = email
 
+
+    # cursor.execute("SELECT * FROM users WHERE email = %s and username = %s", (pe_email, euser,))
+    # user = cursor.fetchone()
+    # cursor.close()
+
+    if eList['email'] == email:
+        # # Email exists in the database
+        # # Generate a time-limited token for email verification
+        # token = s.dumps(email, salt='email-confirm')
+        #
+        # # Create a message with the verification link and send it via email
+        # v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])  # Replace with your Gmail email
+        # link = url_for('confirm_email1', token=token, _external=True)
+        # v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
+        # mail.send(v_msg)
+        #
+        # # Store the email in the session for further processing
+        # session['email'] = email
         return 0
     else:
         # Email does not exist in the database
