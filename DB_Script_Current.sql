@@ -91,6 +91,16 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Audit Log Table
+--
+DROP TABLE IF EXISTS `audit_logs`;
+CREATE TABLE `audit_logs`(
+    `id` int(11) NOT NULL auto_increment ,
+    `msg` varchar(100) NOT NULL ,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB auto_increment = 2 default charset =utf8;
+
+--
 -- Dumping data for table `users`
 --
 
