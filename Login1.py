@@ -615,6 +615,8 @@ def update_card():
             msg = 'Error in updating'
     return render_template('update.html', msg=msg, form=updateForm)
 
+@app.route('/')
+
 
 #Start of Google Oauth
 @app.route("/google_login")

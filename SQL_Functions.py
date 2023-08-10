@@ -22,7 +22,7 @@ app.config['MYSQL_PASSWORD'] = 'password123'
 app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
 
-def create_audit_log(log_message):
+def add_audit_log(log_message):
     cursor = mysql.connection.cursor()
     cursor.execute('INSERT INTO audit_logs (serial_number, log_message VALUES (NULL, %s)', (log_message))
     mysql.connection.commit()
