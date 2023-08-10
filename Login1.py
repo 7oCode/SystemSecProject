@@ -719,4 +719,3 @@ def admin_view_logs():
 
 if __name__ == '__main__':
     app.run()
-
