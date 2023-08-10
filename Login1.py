@@ -74,6 +74,13 @@ flow = Flow.from_client_secrets_file(
     redirect_uri="http://127.0.0.1:5000/callback"
 )
 
+#create audit log function
+def create_audit_log(log_message):
+    cursor = mysql.connection.cursor()
+    cursor.execute('INSERT INTO audit_logs (serial_number, log_message VALUES (NULL, %s)', (log_message))
+    mysql.connection.commit()
+    cursor.close()
+
 def login_is_required(function):
     def wrapper(*args, **kwargs):
         if "google_id" not in session:
@@ -385,6 +392,13 @@ def register():
 
         if SQL_Register(username,password,email, phone) == 0:
             msg='Succcess'
+
+            # Add a log entry for successful registration
+            now = datetime.now()
+            date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+            log_message = f"Successful registration for user {username} at time: {date_time_str}"
+            add_audit_log(log_message)
+            
             # token = s.dumps(email, salt='email-confirm')
             #
             # v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
@@ -673,6 +687,33 @@ def SQL_UpdatePasswordAndPhone(user_id, password, phone):
 @login_is_required
 def protected_area():
     return render_template('protected_area.html')
+
+@app.route('/MyWebApp/admin_login_page', methods=['GET', 'POST'])
+def admin_login_page():
+    return render_template('admin_login_page.html')
+
+
+@app.route('/check_for_admin_login/')
+def check_admin_login():
+    if request.method == 'POST':
+        correct_username = 'admin'
+        correct_password = 'admin'
+        entered_username = request.form['admin_username']
+        entered_password = request.form['admin_password']
+        if entered_username == correct_username and entered_password == correct_password:
+            return redirect(url_for('admin_home_page'))
+        else:
+            flash('Invalid username or password', 'error')
+    return render_template('admin_login_page.html')
+
+@app.route('/MyWebApp/admin_home_page', methods=['GET', 'POST'])
+def admin_home_page():
+    return render_template('admin_home_page.html')
+
+@app.route('/MyWebApp/admin_view_logs', methods=['GET', 'POST'])
+def admin_view_logs():
+    return render_template('admin_view_logs.html')
+
 #END
 
 
