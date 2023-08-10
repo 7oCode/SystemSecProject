@@ -9,6 +9,7 @@ from cryptography.fernet import Fernet
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+import datetime
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -20,6 +21,12 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'password123'
 app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
+
+def create_audit_log(log_message):
+    cursor = mysql.connection.cursor()
+    cursor.execute('INSERT INTO audit_logs (serial_number, log_message VALUES (NULL, %s)', (log_message))
+    mysql.connection.commit()
+    cursor.close()
 
 
 def SQL_Register(username, password, email, phone):
@@ -71,6 +78,13 @@ def SQL_Register(username, password, email, phone):
         # cursor.execute('INSERT INTO users (username, password, email, phone, column1, column2) VALUES (%s, %s, %s, %s, 0, 0)',(username, hashpwd, encrypted_email, phone,))
 
         mysql.connection.commit()
+
+        # Add a log entry for successful registration
+        now = datetime.now()
+        date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        log_message = f"Successful registration for user {username} at time: {date_time_str}"
+        add_audit_log(log_message)
+        
         return 0
 
 
