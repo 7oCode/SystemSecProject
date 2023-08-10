@@ -46,7 +46,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'mysql'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"]='smtp.gmail.com'
@@ -204,6 +204,13 @@ def login():
             # )
             #
             # return redirect(url_for('verify_otp'))
+
+            # Add a log entry for successful registration
+            now = datetime.now()
+            date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+            log_message = f"Successful login for user {username} at time: {date_time_str}"
+            add_audit_log(log_message)
+
             print(f"{username}, {password}")
             return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
@@ -615,15 +622,7 @@ def update_card():
             msg = 'Error in updating'
     return render_template('update.html', msg=msg, form=updateForm)
 
-@app.route('/newTransaction')
-def newtransaction():
-    msg = ''
-    newT = newTransaction()
-
-    if newT.validate_on_submit():
-        pass
-
-    return render_template('transaction.html', msg=msg, form=newT)
+@app.route('/')
 
 
 #Start of Google Oauth
@@ -704,14 +703,17 @@ def admin_login_page():
     return render_template('admin_login_page.html')
 
 
-@app.route('/check_for_admin_login/')
+@app.route('/check_for_admin_login/', methods=['GET', 'POST'])
 def check_admin_login():
+    #print(request.method)
     if request.method == 'POST':
         correct_username = 'admin'
         correct_password = 'admin'
         entered_username = request.form['admin_username']
         entered_password = request.form['admin_password']
+        #print(correct_username, correct_password, entered_username, entered_password)
         if entered_username == correct_username and entered_password == correct_password:
+            #print(correct_username, correct_password, entered_username, entered_password)
             return redirect(url_for('admin_home_page'))
         else:
             flash('Invalid username or password', 'error')
@@ -726,12 +728,14 @@ def display_logs():
     cursor.execute("SELECT * FROM audit_logs")
     logs = cursor.fetchall()
     logs = list(logs)
+    #print(logs)
 
     return logs
 
 @app.route('/MyWebApp/admin_view_logs', methods=['GET', 'POST'])
 def admin_view_logs():
     logs = display_logs()
+    #print(logs)
     return render_template('admin_view_logs.html', logs = logs)
 
 #END
