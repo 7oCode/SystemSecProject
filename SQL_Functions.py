@@ -9,7 +9,7 @@ from cryptography.fernet import Fernet
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
-import datetime
+from datetime import datetime
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -24,7 +24,7 @@ mysql = MySQL(app)
 
 def add_audit_log(log_message):
     cursor = mysql.connection.cursor()
-    cursor.execute('INSERT INTO audit_logs (serial_number, log_message VALUES (NULL, %s)', (log_message))
+    cursor.execute('INSERT INTO audit_logs VALUES (NULL, %s)', (log_message,))
     mysql.connection.commit()
     cursor.close()
 
