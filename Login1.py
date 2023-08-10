@@ -197,6 +197,7 @@ def login():
             # )
             #
             # return redirect(url_for('verify_otp'))
+            print(f"{username}, {password}")
             return redirect(url_for('home'))
         elif SQL_Login(username, password) == 1:
             a = SQL_rate_limit_def()
@@ -233,12 +234,13 @@ def login():
     #     msg = 'Typo'
     return render_template('index.html', msg=msg, form=login)
 
-
+chUser= ''
 @app.route('/forget_password', methods=['GET', 'POST'])
 def forget():
     msg = ''
     forgetForm = forgetPassword()
     if forgetForm.validate_on_submit():
+        global chUser
         email = forgetForm.email.data
         user = forgetForm.username.data
         # print(SQL_Check_Email(email, user))
@@ -257,6 +259,7 @@ def forget():
             #
             # # Store the email in the session for further processing
             # session['email'] = email
+            chUser = user
             return redirect(url_for('changepassword'))
 
         elif SQL_Check_Email(email,user) == 1:
@@ -290,6 +293,14 @@ def forget():
 def changepassword():
     msg = ''
     changePW = changePassword()
+    if changePW.validate_on_submit():
+        npwd = changePW.npassword.data
+        opwd = changePW.opassword.data
+
+        if SQL_Update_Password(chUser, npwd, opwd) == 0:
+            return redirect(url_for("login"))
+        elif SQL_Update_Password(chUser, npwd, opwd) == 1:
+            msg = "Error"
 
     return render_template('changepassword.html', form=changePW)
 

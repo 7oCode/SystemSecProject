@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `sys_sec` /*!40100 DEFAULT CHARACTER SET utf8mb3 */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `sys_sec`;
 -- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
 --
 -- Host: localhost    Database: sys_sec
@@ -74,33 +72,6 @@ LOCK TABLES `pwd_hist` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `transactions`
---
-
-DROP TABLE IF EXISTS `transactions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `transactions` (
-  `transaction_id` int NOT NULL,
-  `trans_type` varchar(45) NOT NULL,
-  `cost` varchar(45) NOT NULL,
-  `date` varchar(10) NOT NULL,
-  `card_id` varchar(2) NOT NULL,
-  `user_id` varchar(2) NOT NULL,
-  PRIMARY KEY (`transaction_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `transactions`
---
-
-LOCK TABLES `transactions` WRITE;
-/*!40000 ALTER TABLE `transactions` DISABLE KEYS */;
-/*!40000 ALTER TABLE `transactions` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `users`
 --
 
@@ -116,7 +87,7 @@ CREATE TABLE `users` (
   `rate_limit` varchar(1) NOT NULL DEFAULT '0',
   `otp_attempt` varchar(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -125,7 +96,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (57,'Default','$2b$12$7XW/c5q.t0V47v/AWp5Lf.BStUbLIRLYzsnkV9ZzFqlUh3Y725B7e','gAAAAABkxwRXtzldaEHMHv4N5--BEbe4BDUJx29A6rZe2Uh50zkqM_6HRxE93B_xZEnItNpRG-s2Qd58GW5C2MsB5SJlG1KVcGVisZfMzEmTtKvHNvYHjvs=','+6583098239','0','0'),(58,'Jeff1234','$2b$12$AsxEdUjMbi2TKK3ml7NV6.xZGPJT6PfcQk7JS/8b411Ys4.ZFAKja','gAAAAABkxwaPeE1nlIHuhl_tGkK_t6Cpe0bXq63vSIsqCrcC06XL2iKxt_TXQXXueOiUWbN0sYCgQY-THwS0FXG7BC1dr46WCw==','+6583098329','0','0');
+INSERT INTO `users` VALUES (53,'Jeff1234','$2b$12$cREQQza9kUw6cbdGniBZNeuIiiqDHrFNd15BE6yvjdB4AN0BRnJ4C','gAAAAABkxMr95MVocKhWowtbGuBtoMyHTM-EjUGuk81DC-xZSRHfSBh8LucfaPR4iVFH76ukEditydAr7X9MFNlHaDcF49Z2Hg==','+6583098239','2','0'),(55,'Jeff123','$2b$12$0z6a9AnPOj9TTcOh8koG.O31Pxk2BEqLuduriaoxDQxsTwAwLvt4W','gAAAAABkxQBR11ARl2SdS-A82ZEC81zqEdY_6yLudN1NMcf9_V2VkZ4vB1yY6xAZMJlV2_gq8T4t8ZuKrmrSvMZoWrqQJSd9FA==','+6583098239','0','0'),(56,'Vmuser1234','$2b$12$zouVuw6FM8on9ZsdHkuOWu3e2b40pXBJTEazeeuhjSxrP2VkUQ3Ka','gAAAAABkxQhNvOp4nib-oSOBNqAbILVLyVX3u_q1e2bdCK9HScKxqaaKBbm-fO9jLXJ8acvIg1W4bwbBib94HwEcj8YxkT9ohA==','+6583098239','0','0'),(57,'Default','$2b$12$D/zHQKSVo2n2gpdUHrVvP.XRLTwjSoQGZqZH03Pgp1fyyE3dcgC4K','gAAAAABk0iu-SFypV0daZvTaQt_BkzZ3S6CcTiku70Aj5OTxIXtccblQxgK9dX2QGipOGMLiOYN0U6r8fC3g_QUx-EJw2btY1w==','+6583098239','0','0');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -138,4 +109,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-07-31 10:54:24
+-- Dump completed on 2023-08-10 21:42:56

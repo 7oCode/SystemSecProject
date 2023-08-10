@@ -381,5 +381,26 @@ def SQL_UpdatePasswordAndPhone(user_id, password, phone):
     mysql.connection.commit()
     cursor.close()
 
-def SQL_Update_Password(email,npass):
-    pass
+def SQL_Update_Password(user,npass, opass):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT password FROM users WHERE username = %s', (user,))
+    uchange = cursor.fetchone()
+    print(uchange)
+    ohash = bcrypt.generate_password_hash(opass)
+    print(ohash)
+    print(uchange['password'])
+    if ohash == uchange['password']:
+        hashpwd = bcrypt.generate_password_hash(npass)
+        cursor.execute("UPDATE users SET password = %s WHERE username = %s", (hashpwd,user,))
+        mysql.connection.commit()
+        cursor.execute('SELECT password FROM users WHERE username = %s', (user,))
+        uUpdate = cursor.fetchone()
+        print(uUpdate)
+        return 0
+    else:
+        print("Error")
+        return 1
+
+
+
+

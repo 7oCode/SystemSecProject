@@ -4,10 +4,13 @@ from flask_wtf import FlaskForm, RecaptchaField
 
 class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired('Username required'),
-                                                   Length(min=5, max=10, message='5-10 characters')],render_kw={"placeholder": "Username"})
+                                                   Length(min=5, max=10, message='5-10 characters')],
+                           render_kw={"placeholder": "Username"})
 
-    password = PasswordField('password', validators=[InputRequired('Password required'),Regexp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$"),
-                                                     Length(min=8, max=20, message='At least 8 characters')],render_kw={"placeholder": "Password"})
+    password = PasswordField('password', validators=[InputRequired('Password required'),
+                                                     Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$"),
+                                                     Length(min=8, max=20, message='At least 8 characters')],
+                             render_kw={"placeholder": "Password"})
 
 
     phone = StringField('phone', validators=[InputRequired('Phone number required'),
@@ -71,8 +74,12 @@ class forgetPassword(FlaskForm):
                                                    ],render_kw={"placeholder": "Username"})
 
 class changePassword(FlaskForm):
-    password = StringField('password', validators=[InputRequired('New password Required'), Length(min=8, max=20),
-                                                   Regexp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
+    npassword = PasswordField('npassword', validators=[InputRequired('New password Required'), Length(min=8, max=20),
+                                                   Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
                            render_kw={'placeholder': 'New Password'})
+
+    opassword = PasswordField('opassword', validators=[InputRequired('New password Required'), Length(min=8, max=20),
+                                                   Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
+                           render_kw={'placeholder': 'Old Password'})
 
 
