@@ -721,9 +721,18 @@ def check_admin_login():
 def admin_home_page():
     return render_template('admin_home_page.html')
 
+def display_logs():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM audit_logs")
+    logs = cursor.fetchall()
+    logs = list(logs)
+
+    return logs
+
 @app.route('/MyWebApp/admin_view_logs', methods=['GET', 'POST'])
 def admin_view_logs():
-    return render_template('admin_view_logs.html')
+    logs = display_logs()
+    return render_template('admin_view_logs.html', logs = logs)
 
 #END
 
