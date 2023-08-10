@@ -615,7 +615,15 @@ def update_card():
             msg = 'Error in updating'
     return render_template('update.html', msg=msg, form=updateForm)
 
-@app.route('/')
+@app.route('/newTransaction')
+def newtransaction():
+    msg = ''
+    newT = newTransaction()
+
+    if newT.validate_on_submit():
+        pass
+
+    return render_template('transaction.html', msg=msg, form=newT)
 
 
 #Start of Google Oauth

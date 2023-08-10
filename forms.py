@@ -1,4 +1,4 @@
-from wtforms import StringField, PasswordField,validators,IntegerField
+from wtforms import StringField, PasswordField,validators,IntegerField, TextAreaField
 from wtforms.validators import InputRequired, Length, Regexp
 from flask_wtf import FlaskForm, RecaptchaField
 
@@ -74,11 +74,26 @@ class forgetPassword(FlaskForm):
                                                    ],render_kw={"placeholder": "Username"})
 
 class changePassword(FlaskForm):
-    npassword = PasswordField('npassword', validators=[InputRequired('New password Required'), Length(min=8, max=20)],
+    npassword = PasswordField('npassword', validators=[InputRequired('New password Required'), Length(min=8, max=20),
+                                                       Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
                            render_kw={'placeholder': 'New Password'})
 
-    opassword = PasswordField('opassword', validators=[InputRequired('Old password Required'), Length(min=8, max=20)],
+    opassword = PasswordField('opassword', validators=[InputRequired('Old password Required'), Length(min=8, max=20),
+                                                       Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
                            render_kw={'placeholder': 'Old Password'})
+
+class newTransaction(FlaskForm):
+    card_num = StringField('card_num', validators=[InputRequired('Card number required'),
+                                                   Length(min=16,max=16, message='Valid number please'),
+                                                   Regexp(r'^\d+$')], render_kw={'placeholder': 'Card Number'})
+
+    transaction = TextAreaField("transaction", validators=[InputRequired('Enter Transaction'), Length(min=4, max=100, message="Too short")],
+                                render_kw={"placeholder" : "Enter transaction here"})
+
+    cost = IntegerField("cost", validators=[InputRequired('Enter cost'), Length(min=1, max=1000, message='Only numbers allowed')],
+                        render_kw={"placeholder": "Cost"})
+
+
 
 
 # Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")

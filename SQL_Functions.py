@@ -416,6 +416,7 @@ def SQL_Update_Password(user,npass, opass):
         print("Error")
         return 1
 
-
+def SQL_New_Transaction(cnum, trans, cost):
+    pass
 
 
