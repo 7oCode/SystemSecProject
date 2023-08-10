@@ -8,7 +8,7 @@ class RegisterForm(FlaskForm):
                            render_kw={"placeholder": "Username"})
 
     password = PasswordField('password', validators=[InputRequired('Password required'),
-                                                     Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$"),
+                                                     Regexp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'),
                                                      Length(min=8, max=20, message='At least 8 characters')],
                              render_kw={"placeholder": "Password"})
 
@@ -79,7 +79,7 @@ class changePassword(FlaskForm):
                            render_kw={'placeholder': 'New Password'})
 
     opassword = PasswordField('opassword', validators=[InputRequired('New password Required'), Length(min=8, max=20),
-                                                   Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
+                                                   Regexp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')],
                            render_kw={'placeholder': 'Old Password'})
 
 

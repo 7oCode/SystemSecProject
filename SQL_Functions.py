@@ -271,7 +271,7 @@ def SQL_Check_Email(email,euser):
     cursor.execute("SELECT * FROM users where username = %s", (euser,))
     eList = cursor.fetchone()
     # eList = list(eList)
-    print(eList)
+    # print(eList)
     dList = []
     # d = 0
     for filename in os.listdir():
@@ -280,7 +280,7 @@ def SQL_Check_Email(email,euser):
         # d += 1
 
     dList.sort()
-    print(dList)
+    # print(dList)
     pList = []
     ddList = []
     # for i in range(len(eList)):
@@ -309,7 +309,7 @@ def SQL_Check_Email(email,euser):
     except:
         return 1
 
-    print(eList)
+    # print(eList)
 
 
 
