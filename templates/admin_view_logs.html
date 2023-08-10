@@ -16,10 +16,10 @@
                   </tr>
               </th>
               <tbody>
-                {% for card in cards %}
+                {% for log in logs %}
                 <tr>
-                    <td>{{card['ig']}}</td>
-                    <td>{{card['msg']}}</td>
+                    <td>{{log[0]}}</td>
+                    <td>{{log[1]}}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -28,7 +28,7 @@
 
 
         {% if logs|length == 0 %}
-        <p>You haven't added a credit card yet.</p>
+        <p>There are no logs.</p>
         {% endif %}
 
 <!--        <div class="page-header section-dark" style="background-image: url('http://demos.creative-tim.com/paper-kit-2/assets/img/antoine-barres.jpg')">-->
