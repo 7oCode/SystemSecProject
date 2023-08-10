@@ -289,20 +289,21 @@ def forget():
     return render_template('forgetpass.html', msg=msg, form=forgetForm)
 
 
-@app.route('/changepassword')
+@app.route('/changepassword', methods=['GET', 'POST'])
 def changepassword():
     msg = ''
-    changePW = changePassword()
-    if changePW.validate_on_submit():
-        npwd = changePW.npassword.data
-        opwd = changePW.opassword.data
+    changepwd = changePassword()
+    if changepwd.validate_on_submit():
+        npwd = changepwd.npassword.data
+        opwd = changepwd.opassword.data
 
         if SQL_Update_Password(chUser, npwd, opwd) == 0:
             return redirect(url_for("login"))
         elif SQL_Update_Password(chUser, npwd, opwd) == 1:
             msg = "Error"
+    print(changepwd.validate_on_submit())
 
-    return render_template('changepassword.html', form=changePW)
+    return render_template('changepassword.html', form=changepwd, msg=msg)
 
 @app.route('/confirm_email1/<token>')
 def confirm_email1(token):

@@ -74,12 +74,11 @@ class forgetPassword(FlaskForm):
                                                    ],render_kw={"placeholder": "Username"})
 
 class changePassword(FlaskForm):
-    npassword = PasswordField('npassword', validators=[InputRequired('New password Required'), Length(min=8, max=20),
-                                                   Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
+    npassword = PasswordField('npassword', validators=[InputRequired('New password Required'), Length(min=8, max=20)],
                            render_kw={'placeholder': 'New Password'})
 
-    opassword = PasswordField('opassword', validators=[InputRequired('New password Required'), Length(min=8, max=20),
-                                                   Regexp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')],
+    opassword = PasswordField('opassword', validators=[InputRequired('Old password Required'), Length(min=8, max=20)],
                            render_kw={'placeholder': 'Old Password'})
 
 
+# Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")

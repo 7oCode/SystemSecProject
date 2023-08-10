@@ -386,16 +386,17 @@ def SQL_Update_Password(user,npass, opass):
     cursor.execute('SELECT password FROM users WHERE username = %s', (user,))
     uchange = cursor.fetchone()
     print(uchange)
-    ohash = bcrypt.generate_password_hash(opass)
+    ohash = uchange['password']
     print(ohash)
     print(uchange['password'])
-    if ohash == uchange['password']:
+    if bcrypt.check_password_hash(ohash, opass):
         hashpwd = bcrypt.generate_password_hash(npass)
         cursor.execute("UPDATE users SET password = %s WHERE username = %s", (hashpwd,user,))
         mysql.connection.commit()
         cursor.execute('SELECT password FROM users WHERE username = %s', (user,))
         uUpdate = cursor.fetchone()
         print(uUpdate)
+        print('epic style')
         return 0
     else:
         print("Error")
