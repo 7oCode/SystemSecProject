@@ -283,6 +283,8 @@ def SQL_Check_Email(email,euser):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT * FROM users where username = %s", (euser,))
     eList = cursor.fetchone()
+    if eList is None:
+        return 1
     # eList = list(eList)
     # print(eList)
     dList = []
@@ -394,15 +396,15 @@ def SQL_UpdatePasswordAndPhone(user_id, password, phone):
     mysql.connection.commit()
     cursor.close()
 
-def SQL_Update_Password(user,npass, opass):
+def SQL_Update_Password(user,npass, opass,sans):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT password FROM users WHERE username = %s', (user,))
+    cursor.execute('SELECT * FROM users WHERE username = %s', (user,))
     uchange = cursor.fetchone()
     print(uchange)
     ohash = uchange['password']
     print(ohash)
     print(uchange['password'])
-    if bcrypt.check_password_hash(ohash, opass):
+    if bcrypt.check_password_hash(ohash, opass) and (uchange['s_ans'] == sans):
         hashpwd = bcrypt.generate_password_hash(npass)
         cursor.execute("UPDATE users SET password = %s WHERE username = %s", (hashpwd,user,))
         mysql.connection.commit()
@@ -459,3 +461,10 @@ def transactions(uID):
     cList = list(cList)
     print(cList)
     return cList
+
+def question(uID):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT securityquestion FROM users WHERE username = %s", (uID,))
+    ucheck = cursor.fetchone()
+    uquest = ucheck['securityquestion']
+    return uquest

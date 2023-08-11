@@ -1,6 +1,17 @@
 from wtforms import StringField, PasswordField,validators,IntegerField, TextAreaField, SelectField
 from wtforms.validators import InputRequired, Length, Regexp
 from flask_wtf import FlaskForm, RecaptchaField
+from flask_mysqldb import MySQL
+from Login1 import *
+from SQL_Functions import *
+
+app = Flask(__name__)
+
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_DB'] = 'sys_sec'
+mysql = MySQL(app)
 
 class RegisterForm(FlaskForm):
     username = StringField('username', validators=[InputRequired('Username required'),
@@ -79,14 +90,26 @@ class forgetPassword(FlaskForm):
                                                    Length(min=5, max=10, message='5-10 characters'),
                                                    ],render_kw={"placeholder": "Username"})
 
+
+
+
 class changePassword(FlaskForm):
     npassword = PasswordField('npassword', validators=[InputRequired('New password Required'), Length(min=8, max=20),
-                                                       Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
+                                                       Regexp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')],
                            render_kw={'placeholder': 'New Password'})
 
     opassword = PasswordField('opassword', validators=[InputRequired('Old password Required'), Length(min=8, max=20),
-                                                       Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")],
+                                                       Regexp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')],
                            render_kw={'placeholder': 'Old Password'})
+
+    # Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")
+
+    # secquestions = [("Q1: Will I play Genshin Impact?"), ("Q2: What is 2+2?")]
+    # securityquestions = SelectField("Select a question", choices=secquestions, validators=[InputRequired()])
+    securityquestion = StringField('question', render_kw={'readonly': True, "style": "width: 350px"})
+
+    s_ans = StringField('answer', validators=[InputRequired('Answer required')],
+                        render_kw={"placeholder": "Answer"})
 
 class newTransaction(FlaskForm):
     card_num = StringField('card_num', validators=[InputRequired('Card number required'),

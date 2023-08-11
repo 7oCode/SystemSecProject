@@ -267,6 +267,7 @@ def forget():
             # # Store the email in the session for further processing
             # session['email'] = email
             chUser = user
+            print(question(chUser))
             return redirect(url_for('changepassword'))
 
         elif SQL_Check_Email(email,user) == 1:
@@ -299,14 +300,19 @@ def forget():
 @app.route('/changepassword', methods=['GET', 'POST'])
 def changepassword():
     msg = ''
+
     changepwd = changePassword()
+    changepwd.securityquestion.data = question(chUser)
+
     if changepwd.validate_on_submit():
         npwd = changepwd.npassword.data
         opwd = changepwd.opassword.data
+        # squest = changepwd.securityquestions.data
+        sans = changepwd.s_ans.data
 
-        if SQL_Update_Password(chUser, npwd, opwd) == 0:
+        if SQL_Update_Password(chUser, npwd, opwd,sans) == 0:
             return redirect(url_for("login"))
-        elif SQL_Update_Password(chUser, npwd, opwd) == 1:
+        elif SQL_Update_Password(chUser, npwd, opwd,sans) == 1:
             msg = "Error"
     print(changepwd.validate_on_submit())
 
