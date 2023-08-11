@@ -6,12 +6,15 @@ import re
 from cryptography.fernet import Fernet
 from SQL_Functions import *
 from forms import *
-from twilio.rest import Client
-from datetime import timedelta
 from flask import *
 from flask_mail import Mail, Message
 from random import *
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+
+from twilio.rest import Client
+from datetime import timedelta
+import smtplib
+from tkinter import *
 
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
@@ -726,26 +729,83 @@ def admin_login_page():
     return render_template('admin_login_page.html')
 
 
-@app.route('/check_for_admin_login/')
+@app.route('/check_for_admin_login/', methods=['GET', 'POST'])
 def check_admin_login():
+    #print(request.method)
     if request.method == 'POST':
         correct_username = 'admin'
         correct_password = 'admin'
         entered_username = request.form['admin_username']
         entered_password = request.form['admin_password']
+        entered_email = request.form['admin_email']
+        #print(correct_username, correct_password, entered_username, entered_password)
         if entered_username == correct_username and entered_password == correct_password:
-            return redirect(url_for('admin_home_page'))
+            #print(correct_username, correct_password, entered_username, entered_password)
+
+            # app.config["MAIL_SERVER"] = 'smtp.gmail.com'
+            # app.config["MAIL_PORT"] = 465
+            # app.config["MAIL_USERNAME"] = 'mohd.irfan.khan.9383@gmail.com'
+            # app.config['MAIL_PASSWORD'] = 'afxjkjngfitkekzs'
+            # app.config['MAIL_USE_TLS'] = False
+            # app.config['MAIL_USE_SSL'] = True
+
+            # Generate OTP and send it to the user's email
+            otp = str(randint(100000, 999999))
+            TO = entered_email  # user's email
+            FROM = 'mohd.irfan.khan.9383@gmail.com'  # coder's Gmail email
+            SUBJECT = "Verification"
+            TEXT = str("Your OTP is: " + otp)
+            MESSAGE = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(FROM, 'afxjkjngfitkekzs')  # coder's email password
+            server.sendmail(FROM, TO, MESSAGE)
+
+            # Store OTP and username in the session
+            session['otp'] = otp
+            session['username'] = entered_username
+
+            # Redirect to OTP verification page
+            return redirect(url_for('otp_verification'))
         else:
             flash('Invalid username or password', 'error')
     return render_template('admin_login_page.html')
+
+@app.route('/otp_verification', methods=['GET', 'POST'])
+def otp_verification():
+    if 'otp' in session and 'username' in session:
+        if request.method == 'POST':
+            entered_otp = request.form.get('otp')
+            stored_otp = session['otp']
+            print(entered_otp, stored_otp)
+            if entered_otp == stored_otp:
+                # OTP verification successful
+                # Perform the login action
+                return redirect(url_for('admin_home_page'))
+            else:
+                error_msg = "Invalid OTP. Please try again."
+                return render_template('otp_verification.html', error=error_msg)
+
+        return render_template('otp_verification.html')
 
 @app.route('/MyWebApp/admin_home_page', methods=['GET', 'POST'])
 def admin_home_page():
     return render_template('admin_home_page.html')
 
+def display_logs():
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM audit_logs")
+    logs = cursor.fetchall()
+    logs = list(logs)
+    #print(logs)
+
+    return logs
+
 @app.route('/MyWebApp/admin_view_logs', methods=['GET', 'POST'])
 def admin_view_logs():
-    return render_template('admin_view_logs.html')
+    logs = display_logs()
+    #print(logs)
+    return render_template('admin_view_logs.html', logs = logs)
 
 #END
 

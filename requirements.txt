@@ -1,4 +1,5 @@
 Flask
+flask_session
 Flask-MySQLdb
 Flask-Bcrypt
 flask-wtf
@@ -6,6 +7,7 @@ cryptography
 twilio
 Flask-Mail
 itsdangerous
+google
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
