@@ -390,15 +390,17 @@ def register():
         password = regform.password.data
         email = request.form['email']
         phone = regform.phone.data
+        squest = regform.securityquestions.data
+        s_ans = regform.s_ans.data
 
-        if SQL_Register(username,password,email, phone) == 0:
+        if SQL_Register(username,password,email, phone, squest, s_ans) == 0:
             msg='Succcess'
 
             # Add a log entry for successful registration
-            now = datetime.now()
-            date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
-            log_message = f"Successful registration for user {username} at time: {date_time_str}"
-            add_audit_log(log_message)
+            # now = datetime.now()
+            # date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+            # log_message = f"Successful registration for user {username} at time: {date_time_str}"
+            # add_audit_log(log_message)
             
             # token = s.dumps(email, salt='email-confirm')
             #
@@ -427,7 +429,7 @@ def register():
             #
             # # return render_template('thanks.html', username=username, password=password, email=email, link=link)
             # return redirect(url_for('email_verification'))
-        elif SQL_Register(username, password, email, phone) == 1:
+        elif SQL_Register(username, password, email, phone, squest,s_ans) == 1:
             msg = 'Error'
 
 
