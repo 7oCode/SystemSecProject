@@ -60,7 +60,31 @@
     </div> -->
 
             <h2 class="order-history-title">Order History</h2>
+      {% if hist|length != 0 %}
+            <table>
+          <th>
+
+              <tr>
+                  <th>Transaction</th>
+                  <th>Cost</th>
+                  <th>Card Number</th>
+              </tr>
+          </th>
+          <tbody>
+            {% for card in hist %}
+            <tr>
+                <td>{{card['transaction']}}</td>
+                <td>{{card['cost']}}</td>
+                <td>{{card['card_num']}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+      {% endif %}
+
+      {% if cards|length == 0 %}
     <p>You haven't purchased anything yet.</p>
+      {% endif %}
   </div>
   <div class="right-col">
         <h2>Add Card</h2>

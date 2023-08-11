@@ -201,10 +201,9 @@ def SQL_registerCard(card_no, fname, lname, exp_date, cvv, uID):
 def readCards(uID):
     print(type(uID))
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute('SELECT * FROM card_info WHERE user_id = %s', (uID,))
+    cursor.execute('SELECT fullname, card_num,exp_date, budget FROM card_info WHERE user_id = %s', (uID,))
     cList = cursor.fetchall()
     cList = list(cList)
-    print(cList)
 
     # file = open(f'_card.key', 'rb')
     # key = file.read()
@@ -230,7 +229,7 @@ def readCards(uID):
             except:
                 continue
         # cList[j]['card_num'] = i['card_num']
-
+    print(cList)
     return cList
 
 def SQL_rate_limit_def():
@@ -416,7 +415,47 @@ def SQL_Update_Password(user,npass, opass):
         print("Error")
         return 1
 
-def SQL_New_Transaction(cnum, trans, cost):
-    pass
+def SQL_New_Transaction(cnum, trans, cost,uID):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * from card_info where user_id = %s", (uID,))
+    tcheck = cursor.fetchall()
+    tcheck = list(tcheck)
+    print(tcheck)
 
+    dList = []
+    for filename in os.listdir():
+        if filename.endswith('_card.key') and filename.__contains__(str(uID)):
+            dList.append(filename)
+    dList.sort()
 
+    for i in range(len(tcheck)):
+        encrypted_card = tcheck[i]['card_num'].encode()
+        for d in dList:
+            file = open(d, 'rb')
+            key = file.read()
+            file.close()
+            f = Fernet(key)
+            try:
+                decrypted_card = f.decrypt(encrypted_card)
+                tcheck[i]['card_num'] = decrypted_card.decode()
+            except:
+                continue
+
+    card_in = False
+    for card in range(len(tcheck)):
+        if cnum == tcheck[card]['card_num']:
+            card_in = True
+            cursor.execute('INSERT INTO transactions VALUES (NULL, %s, %s, %s, %s)', (cnum, cost, trans, uID,))
+            mysql.connection.commit()
+            return 0
+
+    if card_in is False:
+        return 1
+
+def transactions(uID):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT transaction, cost, card_num FROM transactions WHERE user_id = %s', (uID,))
+    cList = cursor.fetchall()
+    cList = list(cList)
+    print(cList)
+    return cList

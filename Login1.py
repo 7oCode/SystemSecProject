@@ -580,6 +580,12 @@ def card():
     except:
         return render_template('registercard.html', msg=msg, form=regcard, cards=[])
 
+    try:
+        ohist = transactions(str(session['id']))
+    except Exception as e:
+        print(f'Error: {e}')
+        return render_template('registercard.html', msg=msg, form=regcard, cards=nList, hist=[])
+
 
     # print(nList)
     if regcard.validate_on_submit():
@@ -596,7 +602,7 @@ def card():
             msg = "Error in adding card"
 
     print(regcard.fname.data, regcard.lname.data, regcard.card_num.data, regcard.exp_date.data, regcard.cvv.data)
-    return render_template('registercard.html', msg=msg, form=regcard, cards=nList)
+    return render_template('registercard.html', msg=msg, form=regcard, cards=nList,hist=ohist)
 
 @app.route('/updateCard', methods=['GET', 'POST'])
 def update_card():
@@ -615,13 +621,21 @@ def update_card():
             msg = 'Error in updating'
     return render_template('update.html', msg=msg, form=updateForm)
 
-@app.route('/newTransaction')
+
+@app.route('/newTransaction', methods=['GET', 'POST'])
 def newtransaction():
     msg = ''
     newT = newTransaction()
 
     if newT.validate_on_submit():
-        pass
+        cnum = newT.card_num.data
+        trans = newT.transaction.data
+        cost = newT.cost.data
+        uID = str(session['id'])
+        if SQL_New_Transaction(cnum,trans,cost,uID) == 0:
+            msg = "Transaction Added"
+        elif SQL_New_Transaction(cnum, trans, cost, uID) == 1:
+            msg = "Error in adding transaction"
 
     return render_template('transaction.html', msg=msg, form=newT)
 

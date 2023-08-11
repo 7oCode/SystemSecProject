@@ -90,7 +90,8 @@ class newTransaction(FlaskForm):
     transaction = TextAreaField("transaction", validators=[InputRequired('Enter Transaction'), Length(min=4, max=100, message="Too short")],
                                 render_kw={"placeholder" : "Enter transaction here"})
 
-    cost = IntegerField("cost", validators=[InputRequired('Enter cost'), Length(min=1, max=1000, message='Only numbers allowed')],
+    cost = StringField("cost", validators=[InputRequired('Enter cost'), Length(min=1, max=4, message='Only numbers allowed'),
+                                           Regexp(r'^\d+$')],
                         render_kw={"placeholder": "Cost"})
 
 
