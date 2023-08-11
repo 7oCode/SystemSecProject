@@ -80,7 +80,7 @@ flow = Flow.from_client_secrets_file(
 #create audit log function
 def add_audit_log(log_message):
     cursor = mysql.connection.cursor()
-    cursor.execute('INSERT INTO audit_logs (serial_number, log_message VALUES (NULL, %s)', (log_message,))
+    cursor.execute('INSERT INTO audit_logs VALUES (NULL, %s)', (log_message,))
     mysql.connection.commit()
     cursor.close()
 
