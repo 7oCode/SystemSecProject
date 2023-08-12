@@ -20,8 +20,9 @@ from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
+import PyPDF2
 
-
+from werkzeug.utils import secure_filename
 from flask_wtf import FlaskForm, RecaptchaField
 
 from google_auth_oauthlib.flow import Flow, InstalledAppFlow
@@ -31,6 +32,7 @@ import os
 import pathlib
 import requests
 import time
+
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -649,6 +651,26 @@ def newtransaction():
             msg = "Error in adding transaction"
 
     return render_template('transaction.html', msg=msg, form=newT)
+
+
+@app.route('/uploadFile', methods=['GET','POST'])
+def uploadfile():
+    msg = ''
+    form = UploadForm()
+    fpath = r"C:\Users\Student\Downloads\\"
+    if form.validate_on_submit():
+        pdf_file = form.pdf_file.data
+        fname = fpath + pdf_file
+        with open(fname, 'rb') as source_file:
+            with open('Upload.docx', 'wb') as destination_file:
+                destination_file.write(source_file.read())
+
+        # Perform further processing or save to database
+
+        msg = 'File uploaded successfully'
+
+    return render_template('uploadfile.html', form=form, msg =msg)
+
 
 
 #Start of Google Oauth

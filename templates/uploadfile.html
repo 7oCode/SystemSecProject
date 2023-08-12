@@ -17,20 +17,15 @@
 <div class="layout-container">
   <div class="left-col">
     <h2>Update Budget</h2>
-      <form method="POST" action="{{url_for('newtransaction')}}">
+      <form method="POST" action="{{url_for('uploadfile')}}">
   			{{ form.csrf_token }}
 
       <div class="inputLabel">Card Number</div>
-        	{{ form.card_num }}
-
-      <div class="inputLabel">Budget</div>
-        	{{ form.cost }}
-
+        	{{ form.pdf_file }}
 
       <div class="card-info-container">
         <div class="expiration-date-container">
         </div>
-        {{ form.transaction }}
 
       </div>
          <div class="cvv-container">

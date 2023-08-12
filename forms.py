@@ -1,4 +1,4 @@
-from wtforms import StringField, PasswordField,validators,IntegerField, TextAreaField, SelectField
+from wtforms import StringField, PasswordField,validators,IntegerField, TextAreaField, SelectField, FileField, ValidationError
 from wtforms.validators import InputRequired, Length, Regexp
 from flask_wtf import FlaskForm, RecaptchaField
 from flask_mysqldb import MySQL
@@ -124,6 +124,18 @@ class newTransaction(FlaskForm):
                         render_kw={"placeholder": "Cost"})
 
 
+
+ALLOWED_EXTENSIONS = {'docx'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+class UploadForm(FlaskForm):
+    pdf_file = FileField('Upload docx File')
+
+    def validate_pdf_file(self, field):
+        if not allowed_file(field.data):
+            raise ValidationError('Only docx files are allowed.')
 
 
 # Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")
