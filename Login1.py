@@ -189,6 +189,9 @@ def login():
         #  and password_validation['password_ok']
         #         print(SQL_Login(username,password))
         if SQL_Login(username, password) == 0:
+            if check_ratelimit(username) == 3:
+                return redirect(url_for('forceuser'))
+
             # super important don't remove
             # Generate OTP and store it in the session
             # otp = str(randint(100000, 999999))
@@ -244,7 +247,7 @@ def login():
                 msg = 'Incorrect Username/Password(u)'
                 print(f"{username}, {password}")
             elif u == 2:
-                return redirect(url_for('forget'))
+                return redirect(url_for('forceuser'))
 
             # Add a log entry for unsuccessful login
             now = datetime.now()
@@ -329,6 +332,62 @@ def forget():
     #         return render_template('forgetpass.html', error=error_msg)
 
     return render_template('forgetpass.html', msg=msg, form=forgetForm)
+
+
+@app.route('/forcechange', methods=['GET', 'POST'])
+def forceuser():
+    msg = ''
+    forgetForm = forgetPassword()
+    if forgetForm.validate_on_submit():
+        global chUser
+        email = forgetForm.email.data
+        user = forgetForm.username.data
+        # print(SQL_Check_Email(email, user))
+        if SQL_Check_Email(email, user) == 0:
+            # msg = 'Email sent to user'
+            # Email exists in the database
+            # Generate a time-limited token for email verification
+            # token = s.dumps(email, salt='email-confirm')
+            #
+            # # Create a message with the verification link and send it via email
+            # v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com',
+            #                 recipients=[email])  # Replace with your Gmail email
+            # link = url_for('confirm_email1', token=token, _external=True)
+            # v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
+            # mail.send(v_msg)
+            #
+            # # Store the email in the session for further processing
+            # session['email'] = email
+            chUser = user
+            print(question(chUser))
+            return redirect(url_for('changepassword'))
+
+        elif SQL_Check_Email(email, user) == 1:
+            msg = 'Error'
+    # if request.method == 'POST':
+    #     email = request.form['email']
+    #
+    #     # Check if the email exists in the SQL database
+    #     if SQL_Check_Email(email):
+    #         # Generate a time-limited token for email verification
+    #         token = s.dumps(email, salt='email-confirm')
+    #
+    #         # Create a message with the verification link and send it via email
+    #         v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])  # Replace with your Gmail email
+    #         link = url_for('confirm_email1', token=token, _external=True)
+    #         v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
+    #         mail.send(v_msg)
+    #
+    #         # Store the email in the session for further processing
+    #         session['email'] = email
+    #
+    #     else:
+    #         # Show an error message if the email does not exist in the database
+    #         error_msg = "Email does not exist in the database. Please enter a valid email address."
+    #         return render_template('forgetpass.html', error=error_msg)
+
+    return render_template('forcereset.html', msg=msg, form=forgetForm)
+
 
 
 @app.route('/changepassword', methods=['GET', 'POST'])
@@ -714,7 +773,11 @@ def forcereset():
     pwreset = ForceReset()
 
     if pwreset.validate_on_submit():
-        pass
+        username = ForceReset.userreset.data
+        if SQL_Check_User(username) == 0:
+            msg = "User will reset on next login"
+        elif SQL_Check_User(username) == 1:
+            msg = "User does not exist"
 
     return render_template('forcereset.html', msg=msg, form=pwreset)
 

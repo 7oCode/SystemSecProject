@@ -435,6 +435,27 @@ def SQL_Update_Password(user,npass, opass,sans):
         print("Error")
         return 1
 
+
+def SQL_Check_User(username):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+    ucheck = cursor.fetchone()
+
+    if ucheck:
+        nrate = '3'
+        cursor.execute('UPDATE users SET rate_limit = %s WHERE usersname = %s', (nrate, username,))
+        return 0
+    else:
+        print("Error")
+        return 1
+
+def check_ratelimit(username):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT rate_limit FROM users WHERE username = %s', (username,))
+    getrate = cursor.fetchone()
+    grate = int(getrate['rate_limit'])
+    return grate
+
 def SQL_New_Transaction(cnum, trans, cost,uID):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT * from card_info where user_id = %s", (uID,))
