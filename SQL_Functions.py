@@ -23,9 +23,9 @@ app.config['MYSQL_DB'] = 'sys_sec'
 mysql = MySQL(app)
 
 #create audit log function
-def add_audit_log(log_message):
+def add_audit_log(log_message, log_type):
     cursor = mysql.connection.cursor()
-    cursor.execute('INSERT INTO audit_logs VALUES (NULL, %s)', (log_message,))
+    cursor.execute('INSERT INTO audit_logs VALUES (NULL, %s, %s)', (log_message, log_type,))
     mysql.connection.commit()
     cursor.close()
 
@@ -81,10 +81,11 @@ def SQL_Register(username, password, email, phone, squest,s_ans):
         mysql.connection.commit()
 
         # Add a log entry for successful registration
-        # now = datetime.now()
-        # date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.now()
+        date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        log_message = f"Successful Registration for user '{username}' via username/password at time: {date_time_str}"
         # log_message = f"Successful registration for user {username} at time: {date_time_str}"
-        # add_audit_log(log_message)
+        add_audit_log(log_message, 'register')
         
         return 0
 
@@ -140,9 +141,25 @@ def SQL_Login(username, password):
         f = Fernet(key)
         decrypted_email = f.decrypt(encrypted_email)
         print(f"Logged in successfully with {decrypted_email.decode()}")
+
+        # Add a log entry for successful login
+        now = datetime.now()
+        date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        log_message = f"Successful Login for user '{username}' via username/password at time: {date_time_str}"
+        # log_message = f"Successful login for user {username} at time: {date_time_str}"
+        add_audit_log(log_message, 'login')
+
         return 0
     else:
         print('Pass no match')
+
+        # Add a log entry for unsuccessful login
+        now = datetime.now()
+        date_time_str = now.strftime("%Y-%m-%d %H:%M:%S")
+        log_message = f"Unsuccessful Login for user '{username}' via username/password at time: {date_time_str}"
+        # log_message = f"Unsuccessful login for user {username} at time: {date_time_str}"
+        add_audit_log(log_message, 'login')
+
         return 2
 
 
