@@ -15,6 +15,11 @@ from twilio.rest import Client
 from datetime import timedelta
 import smtplib
 from tkinter import *
+import pyotp
+import qrcode
+from io import BytesIO
+import base64
+
 
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
@@ -897,45 +902,48 @@ def check_admin_login():
             # app.config['MAIL_USE_TLS'] = False
             # app.config['MAIL_USE_SSL'] = True
 
-            # Generate OTP and send it to the user's email
-            otp = str(randint(100000, 999999))
-            TO = entered_email  # user's email
-            FROM = 'mohd.irfan.khan.9383@gmail.com'  # coder's Gmail email
-            SUBJECT = "Verification"
-            TEXT = str("Your OTP is: " + otp)
-            MESSAGE = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(FROM, 'afxjkjngfitkekzs')  # coder's email password
-            server.sendmail(FROM, TO, MESSAGE)
+            # # Generate OTP and send it to the user's email
+            # otp = str(randint(100000, 999999))
+            # TO = entered_email  # user's email
+            # FROM = 'mohd.irfan.khan.9383@gmail.com'  # coder's Gmail email
+            # SUBJECT = "Verification"
+            # TEXT = str("Your OTP is: " + otp)
+            # MESSAGE = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
+            # server = smtplib.SMTP('smtp.gmail.com', 587)
+            # server.starttls()
+            # server.login(FROM, 'afxjkjngfitkekzs')  # coder's email password
+            # server.sendmail(FROM, TO, MESSAGE)
+            #
+            # # Store OTP and username in the session
+            # session['otp'] = otp
+            # session['username'] = entered_username
+            #
+            # # Redirect to OTP verification page
+            # return redirect(url_for('otp_verification'))
 
-            # Store OTP and username in the session
-            session['otp'] = otp
-            session['username'] = entered_username
-
-            # Redirect to OTP verification page
-            return redirect(url_for('otp_verification'))
+            # Redirect to login_2fa_form verification page
+            return redirect(url_for('login_2fa'))
         else:
             flash('Invalid username or password', 'error')
     return render_template('admin_login_page.html')
 
-
-@app.route('/otp_verification', methods=['GET', 'POST'])
-def otp_verification():
-    if 'otp' in session and 'username' in session:
-        if request.method == 'POST':
-            entered_otp = request.form.get('otp')
-            stored_otp = session['otp']
-            print(entered_otp, stored_otp)
-            if entered_otp == stored_otp:
-                # OTP verification successful
-                # Perform the login action
-                return redirect(url_for('admin_home_page'))
-            else:
-                error_msg = "Invalid OTP. Please try again."
-                return render_template('otp_verification.html', error=error_msg)
-
-        return render_template('otp_verification.html')
+# email otp part
+# @app.route('/otp_verification', methods=['GET', 'POST'])
+# def otp_verification():
+#     if 'otp' in session and 'username' in session:
+#         if request.method == 'POST':
+#             entered_otp = request.form.get('otp')
+#             stored_otp = session['otp']
+#             print(entered_otp, stored_otp)
+#             if entered_otp == stored_otp:
+#                 # OTP verification successful
+#                 # Perform the login action
+#                 return redirect(url_for('admin_home_page'))
+#             else:
+#                 error_msg = "Invalid OTP. Please try again."
+#                 return render_template('otp_verification.html', error=error_msg)
+#
+#         return render_template('otp_verification.html')
 
 
 @app.route('/MyWebApp/admin_home_page', methods=['GET', 'POST'])
@@ -959,6 +967,60 @@ def admin_view_logs():
     # print(logs)
     return render_template('admin_view_logs.html', logs=logs)
 
+
+# ----------- Google Authentication 2FA ---------------
+
+# generating random PyOTP in hex format
+print(pyotp.random_hex()) # returns a 32-character hex-encoded secret
+
+@app.route("/login/2fa/")
+def login_2fa():
+    # Generating random secret key for authentication
+    secret = pyotp.random_base32()
+
+    # Generating TOTP instance for the QR code
+    totp = pyotp.TOTP(secret)
+    otp_url = totp.provisioning_uri("MyWebApp:admin", issuer_name="MyWebApp Admin")
+
+    # Generate a QR code image
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(otp_url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    img_io = BytesIO()
+    img.save(img_io, format="PNG")
+    img_data = img_io.getvalue()
+
+    # Encode the image data as base64
+    img_base64 = base64.b64encode(img_data).decode("utf-8")
+
+    return render_template("login_2fa.html", secret=secret, qr_code=img_base64)
+
+
+
+# 2FA form route
+@app.route("/login/2fa/", methods=["POST"])
+def login_2fa_form():
+    # getting secret key used by user
+    secret = request.form.get("secret")
+    # getting OTP provided by user
+    otp = int(request.form.get("otp"))
+
+    # verifying submitted OTP with PyOTP
+    if pyotp.TOTP(secret).verify(otp):
+        # inform users if OTP is valid
+        flash("The TOTP 2FA token is valid", "success")
+        return redirect(url_for("admin_home_page"))
+    else:
+        # inform users if OTP is invalid
+        flash("You have supplied an invalid 2FA token!", "danger")
+        return redirect(url_for("login_2fa"))
 
 # END
 
