@@ -66,7 +66,7 @@ CREATE TABLE `pwd_hist` (
 -- Dumping data for table `pwd_hist`
 --
 
-LOCK TABLES `pwd_hist` usersWRITE;
+-- LOCK TABLES `pwd_hist` usersWRITE;
 /*!40000 ALTER TABLE `pwd_hist` DISABLE KEYS */;
 /*!40000 ALTER TABLE `pwd_hist` ENABLE KEYS */;
 UNLOCK TABLES;
