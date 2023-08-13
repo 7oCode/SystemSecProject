@@ -27,6 +27,7 @@ class RegisterForm(FlaskForm):
     phone = StringField('phone', validators=[InputRequired('Phone number required'),
                                              Length(min=8, max=15, message='Valid number please'),
                                              Regexp(r'^\+65[89]\d*$')], render_kw={"placeholder": "Phone Number"})
+
     secquestions = [("Q1: Will I play Genshin Impact?"), ("Q2: What is 2+2?")]
     securityquestions = SelectField("Select a question", choices=secquestions, validators=[InputRequired()])
 
