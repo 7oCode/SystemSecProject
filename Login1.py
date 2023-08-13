@@ -37,6 +37,7 @@ import os
 import pathlib
 import requests
 import time
+from flask_session import Session
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -55,7 +56,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'marksql'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
@@ -64,6 +65,16 @@ app.config["MAIL_USERNAME"] = 'mohd.irfan.khan.9383@gmail.com'
 app.config['MAIL_PASSWORD'] = 'afxjkjngfitkekzs'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+
+
+
+# Set the session timeout to 10 minutes
+app.config['SESSION_PERMANENT'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.2)
+
+# Configure the session to use Flask-Session extension
+app.config['SESSION_TYPE'] = 'filesystem'
+Session(app)
 
 # Initialize MySQL
 mysql = MySQL(app)
@@ -480,8 +491,13 @@ def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
-    return redirect(url_for('login'))
 
+    # Clear session data, this will log the user out
+    session.clear()
+    print(session.clear())
+
+    # Redirect to login page
+    return redirect(url_for('login'))
 
 # updated logout function to ensure
 
