@@ -15,8 +15,8 @@ from twilio.rest import Client
 from datetime import timedelta
 import smtplib
 from tkinter import *
-# import pyotp
-# import qrcode
+import pyotp
+import qrcode
 from io import BytesIO
 import base64
 
@@ -933,22 +933,22 @@ def check_admin_login():
     return render_template('admin_login_page.html')
 
 # email otp part
-# @app.route('/otp_verification', methods=['GET', 'POST'])
-# def otp_verification():
-#     if 'otp' in session and 'username' in session:
-#         if request.method == 'POST':
-#             entered_otp = request.form.get('otp')
-#             stored_otp = session['otp']
-#             print(entered_otp, stored_otp)
-#             if entered_otp == stored_otp:
-#                 # OTP verification successful
-#                 # Perform the login action
-#                 return redirect(url_for('admin_home_page'))
-#             else:
-#                 error_msg = "Invalid OTP. Please try again."
-#                 return render_template('otp_verification.html', error=error_msg)
-#
-#         return render_template('otp_verification.html')
+@app.route('/otp_verification', methods=['GET', 'POST'])
+def otp_verification():
+    if 'otp' in session and 'username' in session:
+        if request.method == 'POST':
+            entered_otp = request.form.get('otp')
+            stored_otp = session['otp']
+            print(entered_otp, stored_otp)
+            if entered_otp == stored_otp:
+                # OTP verification successful
+                # Perform the login action
+                return redirect(url_for('admin_home_page'))
+            else:
+                error_msg = "Invalid OTP. Please try again."
+                return render_template('otp_verification.html', error=error_msg)
+
+        return render_template('otp_verification.html')
 
 
 @app.route('/MyWebApp/admin_home_page', methods=['GET', 'POST'])

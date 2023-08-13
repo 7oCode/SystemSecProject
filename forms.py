@@ -47,7 +47,7 @@ class LoginForm(FlaskForm):
                                                      Length(min=8, max=20,)],
                              render_kw={"placeholder": "Password"})
 
-    # recaptcha = RecaptchaField()
+    recaptcha = RecaptchaField()
 
 
 class RegisterCard(FlaskForm):

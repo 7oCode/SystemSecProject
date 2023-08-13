@@ -35,8 +35,12 @@
                 <a href="/google_login"><p class="btn-text"><b style="font-size: 13px;">Log in with google</b></p></a>
             </div>
 
-
-
+            {{ form.recaptcha }}
+			{% for error in form.recaptcha.errors %}
+			<ul>
+				<li style="color:red;">{{ error }}</li>
+			{% endfor %}
+			</ul>
 
                 <div class="msg">{{ msg }}</div>
             <input type="submit" value="Login">
