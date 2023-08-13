@@ -15,8 +15,8 @@ from twilio.rest import Client
 from datetime import timedelta
 import smtplib
 from tkinter import *
-import pyotp
-import qrcode
+# import pyotp
+# import qrcode
 from io import BytesIO
 import base64
 
@@ -858,8 +858,11 @@ def callback():
 
 def SQL_RegisterGoogleUser(google_id, name, email, phone):
     cursor = mysql.connection.cursor()
-    cursor.execute("INSERT INTO users (google_id, username, password, email, phone_no) VALUES (%s, %s, %s, %s, %s)",
-                   (google_id, name, "", email, phone))
+    pw = '$2b$12$2KBJ6o8rUJgHBKjA3ldqy.uKnhSay0GMTSv8uC8EkQScdtg9CU.JG'
+    jeff = 'gAAAAABk2NL8ZhwyQuPZUo6a6rvNfejC9c51J51GiTAm6xVizxOWxliQofE11vCNVEn52P2DtAGRpm7EiaGgHdo5M2QTOcUMiw=='
+    hp='+6583098239'
+    cursor.execute("INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0, 0, %s, 'Q2: What is 2+2?','4')",
+                   (name,pw, jeff, hp, google_id))
     mysql.connection.commit()
     cursor.close()
 
@@ -971,36 +974,36 @@ def admin_view_logs():
 # ----------- Google Authentication 2FA ---------------
 
 # generating random PyOTP in hex format
-print(pyotp.random_hex()) # returns a 32-character hex-encoded secret
+# print(pyotp.random_hex()) # returns a 32-character hex-encoded secret
 
-@app.route("/login/2fa/")
-def login_2fa():
-    # Generating random secret key for authentication
-    secret = pyotp.random_base32()
-
-    # Generating TOTP instance for the QR code
-    totp = pyotp.TOTP(secret)
-    otp_url = totp.provisioning_uri("MyWebApp:admin", issuer_name="MyWebApp Admin")
-
-    # Generate a QR code image
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
-    )
-    qr.add_data(otp_url)
-    qr.make(fit=True)
-
-    img = qr.make_image(fill_color="black", back_color="white")
-    img_io = BytesIO()
-    img.save(img_io, format="PNG")
-    img_data = img_io.getvalue()
-
-    # Encode the image data as base64
-    img_base64 = base64.b64encode(img_data).decode("utf-8")
-
-    return render_template("login_2fa.html", secret=secret, qr_code=img_base64)
+# @app.route("/login/2fa/")
+# def login_2fa():
+#     # Generating random secret key for authentication
+#     secret = pyotp.random_base32()
+#
+#     # Generating TOTP instance for the QR code
+#     totp = pyotp.TOTP(secret)
+#     otp_url = totp.provisioning_uri("MyWebApp:admin", issuer_name="MyWebApp Admin")
+#
+#     # Generate a QR code image
+#     qr = qrcode.QRCode(
+#         version=1,
+#         error_correction=qrcode.constants.ERROR_CORRECT_L,
+#         box_size=10,
+#         border=4,
+#     )
+#     qr.add_data(otp_url)
+#     qr.make(fit=True)
+#
+#     img = qr.make_image(fill_color="black", back_color="white")
+#     img_io = BytesIO()
+#     img.save(img_io, format="PNG")
+#     img_data = img_io.getvalue()
+#
+#     # Encode the image data as base64
+#     img_base64 = base64.b64encode(img_data).decode("utf-8")
+#
+#     return render_template("login_2fa.html", secret=secret, qr_code=img_base64)
 
 
 
