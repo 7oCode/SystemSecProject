@@ -35,14 +35,15 @@ import google.auth.transport.requests
 
 import os
 import pathlib
+from pathlib import Path
 import requests
 import time
 from flask_session import Session
 
-# Set up SSL context
-cert_file = r'.\ssl.crt'
-key_file = r'.\ssl.key'
-ssl_context = (cert_file, key_file)
+# # Set up SSL context
+# cert_file = r'C:\Users\user\Documents\School\Y23S1\System Security Project\SystemSecProject-main\ssl.crt'
+# key_file = r'C:\Users\user\Documents\School\Y23S1\System Security Project\SystemSecProject-main\ssl.key'
+# ssl_context = (cert_file, key_file)
 
 app = Flask(__name__)
 bcrypt = Bcrypt()
@@ -72,7 +73,7 @@ app.config['MAIL_USE_SSL'] = True
 
 # Set the session timeout to 10 minutes
 app.config['SESSION_PERMANENT'] = False
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
 
 # Configure the session to use Flask-Session extension
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -1053,5 +1054,4 @@ def login_2fa_form():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=8100, ssl_context=ssl_context)
-  
+    app.run('0.0.0.0', debug=True, port=8100, ssl_context=(Path('./ssl.crt'), Path('./ssl.key')))
