@@ -18,7 +18,7 @@
 --
 -- Table structure for table `card_info`
 --
-
+LOCK TABLES card_info WRITE;
 DROP TABLE IF EXISTS `card_info`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -86,7 +86,9 @@ CREATE TABLE `users` (
   `phone_no` varchar(11) NOT NULL,
   `rate_limit` varchar(1) NOT NULL DEFAULT '0',
   `otp_attempt` varchar(1) NOT NULL DEFAULT '0',
-  `google_id` varchar(50)
+  `google_id` varchar(50),
+  `securityquestion` varchar(100) NOT NULL,
+  `securityanswer` varchar(100) NOT NULL,
   PRIMARY KEY (`user_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -107,7 +109,7 @@ CREATE TABLE `audit_logs`(
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (53,'Jeff1234','$2b$12$cREQQza9kUw6cbdGniBZNeuIiiqDHrFNd15BE6yvjdB4AN0BRnJ4C','gAAAAABkxMr95MVocKhWowtbGuBtoMyHTM-EjUGuk81DC-xZSRHfSBh8LucfaPR4iVFH76ukEditydAr7X9MFNlHaDcF49Z2Hg==','+6583098239','2','0'),(55,'Jeff123','$2b$12$0z6a9AnPOj9TTcOh8koG.O31Pxk2BEqLuduriaoxDQxsTwAwLvt4W','gAAAAABkxQBR11ARl2SdS-A82ZEC81zqEdY_6yLudN1NMcf9_V2VkZ4vB1yY6xAZMJlV2_gq8T4t8ZuKrmrSvMZoWrqQJSd9FA==','+6583098239','0','0'),(56,'Vmuser1234','$2b$12$zouVuw6FM8on9ZsdHkuOWu3e2b40pXBJTEazeeuhjSxrP2VkUQ3Ka','gAAAAABkxQhNvOp4nib-oSOBNqAbILVLyVX3u_q1e2bdCK9HScKxqaaKBbm-fO9jLXJ8acvIg1W4bwbBib94HwEcj8YxkT9ohA==','+6583098239','0','0'),(57,'Default','$2b$12$D/zHQKSVo2n2gpdUHrVvP.XRLTwjSoQGZqZH03Pgp1fyyE3dcgC4K','gAAAAABk0iu-SFypV0daZvTaQt_BkzZ3S6CcTiku70Aj5OTxIXtccblQxgK9dX2QGipOGMLiOYN0U6r8fC3g_QUx-EJw2btY1w==','+6583098239','0','0');
+-- INSERT INTO `users` VALUES (53,'Jeff1234','$2b$12$cREQQza9kUw6cbdGniBZNeuIiiqDHrFNd15BE6yvjdB4AN0BRnJ4C','gAAAAABkxMr95MVocKhWowtbGuBtoMyHTM-EjUGuk81DC-xZSRHfSBh8LucfaPR4iVFH76ukEditydAr7X9MFNlHaDcF49Z2Hg==','+6583098239','2','0'),(55,'Jeff123','$2b$12$0z6a9AnPOj9TTcOh8koG.O31Pxk2BEqLuduriaoxDQxsTwAwLvt4W','gAAAAABkxQBR11ARl2SdS-A82ZEC81zqEdY_6yLudN1NMcf9_V2VkZ4vB1yY6xAZMJlV2_gq8T4t8ZuKrmrSvMZoWrqQJSd9FA==','+6583098239','0','0'),(56,'Vmuser1234','$2b$12$zouVuw6FM8on9ZsdHkuOWu3e2b40pXBJTEazeeuhjSxrP2VkUQ3Ka','gAAAAABkxQhNvOp4nib-oSOBNqAbILVLyVX3u_q1e2bdCK9HScKxqaaKBbm-fO9jLXJ8acvIg1W4bwbBib94HwEcj8YxkT9ohA==','+6583098239','0','0'),(57,'Default','$2b$12$D/zHQKSVo2n2gpdUHrVvP.XRLTwjSoQGZqZH03Pgp1fyyE3dcgC4K','gAAAAABk0iu-SFypV0daZvTaQt_BkzZ3S6CcTiku70Aj5OTxIXtccblQxgK9dX2QGipOGMLiOYN0U6r8fC3g_QUx-EJw2btY1w==','+6583098239','0','0');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
