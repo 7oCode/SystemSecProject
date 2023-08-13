@@ -86,6 +86,7 @@ CREATE TABLE `users` (
   `phone_no` varchar(11) NOT NULL,
   `rate_limit` varchar(1) NOT NULL DEFAULT '0',
   `otp_attempt` varchar(1) NOT NULL DEFAULT '0',
+  `google_id` varchar(50)
   PRIMARY KEY (`user_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
