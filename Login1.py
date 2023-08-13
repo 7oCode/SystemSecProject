@@ -859,6 +859,8 @@ def callback():
 def SQL_RegisterGoogleUser(google_id, name, email, phone):
     cursor = mysql.connection.cursor()
     pw = '$2b$12$2KBJ6o8rUJgHBKjA3ldqy.uKnhSay0GMTSv8uC8EkQScdtg9CU.JG'
+    """pw - Jeff@1234
+    email - Jeff@gmail.com"""
     jeff = 'gAAAAABk2NL8ZhwyQuPZUo6a6rvNfejC9c51J51GiTAm6xVizxOWxliQofE11vCNVEn52P2DtAGRpm7EiaGgHdo5M2QTOcUMiw=='
     hp='+6583098239'
     cursor.execute("INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0, 0, %s, 'Q2: What is 2+2?','4')",
