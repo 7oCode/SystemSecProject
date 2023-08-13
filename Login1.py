@@ -50,13 +50,10 @@ s = URLSafeTimedSerializer('Thisisasecret!')
 # Change this to your secret key (can be anything, it's for extra protection)
 app.secret_key = 'very secret'
 
-# Set session to expire after 0.5 minutes of inactivity
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.5)
-
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'marksql'
+app.config['MYSQL_PASSWORD'] = 'password123'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
@@ -923,27 +920,27 @@ def check_admin_login():
             # app.config['MAIL_USE_TLS'] = False
             # app.config['MAIL_USE_SSL'] = True
 
-            # # Generate OTP and send it to the user's email
-            # otp = str(randint(100000, 999999))
-            # TO = entered_email  # user's email
-            # FROM = 'mohd.irfan.khan.9383@gmail.com'  # coder's Gmail email
-            # SUBJECT = "Verification"
-            # TEXT = str("Your OTP is: " + otp)
-            # MESSAGE = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
-            # server = smtplib.SMTP('smtp.gmail.com', 587)
-            # server.starttls()
-            # server.login(FROM, 'afxjkjngfitkekzs')  # coder's email password
-            # server.sendmail(FROM, TO, MESSAGE)
-            #
-            # # Store OTP and username in the session
-            # session['otp'] = otp
-            # session['username'] = entered_username
-            #
-            # # Redirect to OTP verification page
-            # return redirect(url_for('otp_verification'))
+            # Generate OTP and send it to the user's email
+            otp = str(randint(100000, 999999))
+            TO = entered_email  # user's email
+            FROM = 'mohd.irfan.khan.9383@gmail.com'  # coder's Gmail email
+            SUBJECT = "Verification"
+            TEXT = str("Your OTP is: " + otp)
+            MESSAGE = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(FROM, 'afxjkjngfitkekzs')  # coder's email password
+            server.sendmail(FROM, TO, MESSAGE)
 
-            # Redirect to login_2fa_form verification page
-            return redirect(url_for('login_2fa'))
+            # Store OTP and username in the session
+            session['otp'] = otp
+            session['username'] = entered_username
+
+            # Redirect to OTP verification page
+            return redirect(url_for('otp_verification'))
+
+            # # Redirect to login_2fa_form verification page
+            # return redirect(url_for('login_2fa'))
         else:
             flash('Invalid username or password', 'error')
     return render_template('admin_login_page.html')
@@ -959,12 +956,16 @@ def otp_verification():
             if entered_otp == stored_otp:
                 # OTP verification successful
                 # Perform the login action
-                return redirect(url_for('admin_home_page'))
+                return redirect(url_for('login_2fa'))
             else:
                 error_msg = "Invalid OTP. Please try again."
                 return render_template('otp_verification.html', error=error_msg)
 
+        # Handle the case when the request method is 'GET'
         return render_template('otp_verification.html')
+
+    # Handle the case when 'otp' or 'username' is not in the session
+    return redirect(url_for('admin_login_page'))
 
 
 @app.route('/MyWebApp/admin_home_page', methods=['GET', 'POST'])
@@ -992,36 +993,36 @@ def admin_view_logs():
 # ----------- Google Authentication 2FA ---------------
 
 # generating random PyOTP in hex format
-# print(pyotp.random_hex()) # returns a 32-character hex-encoded secret
+print(pyotp.random_hex()) # returns a 32-character hex-encoded secret
 
-# @app.route("/login/2fa/")
-# def login_2fa():
-#     # Generating random secret key for authentication
-#     secret = pyotp.random_base32()
-#
-#     # Generating TOTP instance for the QR code
-#     totp = pyotp.TOTP(secret)
-#     otp_url = totp.provisioning_uri("MyWebApp:admin", issuer_name="MyWebApp Admin")
-#
-#     # Generate a QR code image
-#     qr = qrcode.QRCode(
-#         version=1,
-#         error_correction=qrcode.constants.ERROR_CORRECT_L,
-#         box_size=10,
-#         border=4,
-#     )
-#     qr.add_data(otp_url)
-#     qr.make(fit=True)
-#
-#     img = qr.make_image(fill_color="black", back_color="white")
-#     img_io = BytesIO()
-#     img.save(img_io, format="PNG")
-#     img_data = img_io.getvalue()
-#
-#     # Encode the image data as base64
-#     img_base64 = base64.b64encode(img_data).decode("utf-8")
-#
-#     return render_template("login_2fa.html", secret=secret, qr_code=img_base64)
+@app.route("/login/2fa/")
+def login_2fa():
+    # Generating random secret key for authentication
+    secret = pyotp.random_base32()
+
+    # Generating TOTP instance for the QR code
+    totp = pyotp.TOTP(secret)
+    otp_url = totp.provisioning_uri("MyWebApp:admin", issuer_name="MyWebApp Admin")
+
+    # Generate a QR code image
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(otp_url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    img_io = BytesIO()
+    img.save(img_io, format="PNG")
+    img_data = img_io.getvalue()
+
+    # Encode the image data as base64
+    img_base64 = base64.b64encode(img_data).decode("utf-8")
+
+    return render_template("login_2fa.html", secret=secret, qr_code=img_base64)
 
 
 
