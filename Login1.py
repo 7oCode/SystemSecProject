@@ -708,6 +708,16 @@ def uploadfile():
 
     return render_template('uploadfile.html', form=form, msg=msg)
 
+@app.route('/forcereset', methods=['GET', 'POST'])
+def forcereset():
+    msg = ''
+    pwreset = ForceReset()
+
+    if pwreset.validate_on_submit():
+        pass
+
+    return render_template('forcereset.html', msg=msg, form=pwreset)
+
 
 # Start of Google Oauth
 @app.route("/google_login")

@@ -139,4 +139,11 @@ class UploadForm(FlaskForm):
             raise ValidationError('Only docx files are allowed.')
 
 
+class ForceReset(FlaskForm):
+    userreset = StringField('username', validators=[InputRequired('Username required'),
+                                                   Length(min=5, max=10, message='5-10 characters')],
+                           render_kw={"placeholder": "Username"})
+
+
+
 # Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]+$")

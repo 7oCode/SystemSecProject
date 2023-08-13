@@ -75,7 +75,7 @@ def SQL_Register(username, password, email, phone, squest,s_ans):
 
         encrypted_email = f.encrypt(email)
 
-        cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0, 0, %s, %s)', (username, hashpwd, encrypted_email, phone, squest, s_ans))
+        cursor.execute('INSERT INTO users VALUES (NULL, %s, %s, %s, %s, 0, 0, 0, %s, %s)', (username, hashpwd, encrypted_email, phone, squest, s_ans))
         # cursor.execute('INSERT INTO users (username, password, email, phone, column1, column2) VALUES (%s, %s, %s, %s, 0, 0)',(username, hashpwd, encrypted_email, phone,))
 
         mysql.connection.commit()
