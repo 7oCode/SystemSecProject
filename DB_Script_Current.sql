@@ -98,6 +98,7 @@ DROP TABLE IF EXISTS `audit_logs`;
 CREATE TABLE `audit_logs`(
     `id` int(11) NOT NULL auto_increment ,
     `msg` varchar(100) NOT NULL ,
+    `type` varchar(50) NOT NULL ,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB auto_increment = 2 default charset =utf8;
 
