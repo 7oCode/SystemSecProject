@@ -40,8 +40,8 @@ import time
 from flask_session import Session
 
 # Set up SSL context
-cert_file = r'C:\Users\user\Documents\School\Y23S1\System Security Project\SystemSecProject-main\ssl.crt'
-key_file = r'C:\Users\user\Documents\School\Y23S1\System Security Project\SystemSecProject-main\ssl.key'
+cert_file = r'.\ssl.crt'
+key_file = r'.\ssl.key'
 ssl_context = (cert_file, key_file)
 
 app = Flask(__name__)
@@ -72,7 +72,7 @@ app.config['MAIL_USE_SSL'] = True
 
 # Set the session timeout to 10 minutes
 app.config['SESSION_PERMANENT'] = False
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=0.2)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
 
 # Configure the session to use Flask-Session extension
 app.config['SESSION_TYPE'] = 'filesystem'
