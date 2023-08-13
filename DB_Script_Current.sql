@@ -66,7 +66,7 @@ CREATE TABLE `pwd_hist` (
 -- Dumping data for table `pwd_hist`
 --
 
-LOCK TABLES `pwd_hist` usersWRITE;
+-- LOCK TABLES `pwd_hist` usersWRITE;
 /*!40000 ALTER TABLE `pwd_hist` DISABLE KEYS */;
 /*!40000 ALTER TABLE `pwd_hist` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -100,6 +100,7 @@ DROP TABLE IF EXISTS `audit_logs`;
 CREATE TABLE `audit_logs`(
     `id` int(11) NOT NULL auto_increment ,
     `msg` varchar(100) NOT NULL ,
+    `logtype` varchar(100) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB auto_increment = 2 default charset =utf8;
 
