@@ -12,3 +12,7 @@ google-auth
 google-auth-oauthlib
 google-auth-httplib2
 requests
+flask_mail
+pyotp
+PyPDF2
+qrcode
