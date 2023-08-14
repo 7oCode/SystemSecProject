@@ -14,7 +14,6 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from twilio.rest import Client
 from datetime import timedelta
 import smtplib
-from tkinter import *
 import pyotp
 import qrcode
 from io import BytesIO
@@ -32,7 +31,8 @@ from flask_wtf import FlaskForm, RecaptchaField
 
 from google_auth_oauthlib.flow import Flow, InstalledAppFlow
 import google.auth.transport.requests
-
+import tkinter as tk
+from tkinter import ttk
 import os
 import pathlib
 import requests
@@ -53,7 +53,7 @@ app.secret_key = 'very secret'
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
@@ -302,20 +302,20 @@ def forget():
         user = forgetForm.username.data
         # print(SQL_Check_Email(email, user))
         if SQL_Check_Email(email, user) == 0:
-            # msg = 'Email sent to user'
+            msg = 'Email sent to user'
             # Email exists in the database
             # Generate a time-limited token for email verification
-            # token = s.dumps(email, salt='email-confirm')
-            #
-            # # Create a message with the verification link and send it via email
-            # v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com',
-            #                 recipients=[email])  # Replace with your Gmail email
-            # link = url_for('confirm_email1', token=token, _external=True)
-            # v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
-            # mail.send(v_msg)
-            #
-            # # Store the email in the session for further processing
-            # session['email'] = email
+            token = s.dumps(email, salt='email-confirm')
+
+            # Create a message with the verification link and send it via email
+            v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com',
+                            recipients=[email])  # Replace with your Gmail email
+            link = url_for('confirm_email1', token=token, _external=True)
+            v_msg.body = f'To reset your password, click the link: {link}. The link will expire in 3 minutes. Thank You!'
+            mail.send(v_msg)
+
+            # Store the email in the session for further processing
+            session['email'] = email
             chUser = user
             print(question(chUser))
             return redirect(url_for('changepassword'))
@@ -357,7 +357,7 @@ def forceuser():
         user = forgetForm.username.data
         # print(SQL_Check_Email(email, user))
         if SQL_Check_Email(email, user) == 0:
-            # msg = 'Email sent to user'
+            msg = 'Email sent to user'
             # Email exists in the database
             # Generate a time-limited token for email verification
             # token = s.dumps(email, salt='email-confirm')
@@ -452,7 +452,7 @@ def confirm_email1(token):
         email = s.loads(token, salt='email-confirm', max_age=180)
 
         # Check if the email exists in the SQL database
-        if SQL_Check_Email(email):
+        if SQL_Check_Email(email,authUser):
             # Redirect the user to the password reset page with the email as a query parameter
             return redirect(url_for('reset_password', email=email))
         else:
@@ -517,15 +517,17 @@ def logout():
     return redirect(url_for('login'))
 
 # updated logout function to ensure
-
+authUser = None
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = ''
     regform = RegisterForm()
     if regform.validate_on_submit():
+        global authUser
         username = regform.username.data
         password = regform.password.data
         email = request.form['email']
+        authUser = username
         phone = regform.phone.data
         squest = regform.securityquestions.data
         s_ans = regform.s_ans.data
@@ -533,33 +535,34 @@ def register():
         if SQL_Register(username, password, email, phone, squest, s_ans) == 0:
             msg = 'Succcess'
 
-            # token = s.dumps(email, salt='email-confirm')
-            #
-            # v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
-            #
-            # link = url_for('confirm_email', token=token, _external=True)
-            #
-            # v_msg.body = 'To confirm your email, click the link {} . The link will expire in 3 minutes! Thank You'.format(
-            #     link)
-            #
-            # mail.send(v_msg)
-            #
-            # session['username'] = username
-            # session['password'] = password
-            # session['email'] = email
-            #
-            # # phone = regform.phone.data  # Get the phone data from the form
-            # session['phone'] = phone
-            #
-            # # Validate the password using password_check()
-            # password_validation = password_check(password)
-            # print(password_validation)
-            # print(password)
-            # token = s.dumps(email, salt='email-confirm')
-            # link = url_for('confirm_email', token=token, _external=True)
-            #
-            # # return render_template('thanks.html', username=username, password=password, email=email, link=link)
-            # return redirect(url_for('email_verification'))
+            token = s.dumps(email, salt='email-confirm')
+
+            v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
+
+            link = url_for('confirm_email', token=token, _external=True)
+
+            v_msg.body = 'To confirm your email, click the link {} . The link will expire in 3 minutes! Thank You'.format(
+                link)
+
+            mail.send(v_msg)
+
+            session['username'] = username
+            session['password'] = password
+            session['email'] = email
+            session['squest'] = squest
+            session['s_ans'] = s_ans
+
+            # phone = regform.phone.data  # Get the phone data from the form
+            session['phone'] = phone
+
+            # Validate the password using password_check()
+            password_validation = password_check(password)
+            print(password_validation)
+            print(password)
+            token = s.dumps(email, salt='email-confirm')
+            link = url_for('confirm_email', token=token, _external=True)
+
+            return render_template('thanks.html', username=username, password=password, email=email, link=link)
 
             # Add a log entry for successful registration
             now = datetime.now()
@@ -567,6 +570,8 @@ def register():
             log_message = f"Successful registration for user '{username}' via username/password at time: {date_time_str}"
             # log_message = f"Successful registration for user {username} at time: {date_time_str}"
             add_audit_log(log_message, 'registration')
+            return redirect(url_for('email_verification'))
+
 
         elif SQL_Register(username, password, email, phone, squest, s_ans) == 1:
             msg = 'Error'
@@ -583,7 +588,7 @@ def register():
 
 @app.route('/email_verification')
 def email_verification():
-    if 'username' in session and 'password' in session and 'email' in session:
+    if ('username' in session) and ('password' in session) and ('email' in session):
         username = session['username']
         password = session['password']
         email = session['email']
@@ -603,7 +608,9 @@ def confirm_email(token):
         username = session['username']
         password = session['password']
         phone = session['phone']
-        SQL_Register(username, password, email, phone)  # Register the account in the database
+        squest = session['squest']
+        s_ans = session['s_ans']
+        SQL_Register(username, password, email, phone, squest, s_ans)  # Register the account in the database
         session.pop('username', None)
         session.pop('password', None)
         session.pop('email', None)

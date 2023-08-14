@@ -16,3 +16,5 @@ flask_mail
 pyotp
 PyPDF2
 qrcode
+ttk
+Tkinter

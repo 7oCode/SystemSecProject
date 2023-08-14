@@ -296,6 +296,38 @@ def SQL_rate_limit_user(username):
         mysql.connection.commit()
         return 2
 
+def SQL_IrfanEmail(email):
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * FROM users where username = %s", (euser,))
+    eList = cursor.fetchone()
+    if eList is None:
+        return 1
+    # eList = list(eList)
+    # print(eList)
+    dList = []
+    # d = 0
+    for filename in os.listdir():
+        if filename.endswith('.key') and filename.__contains__(euser):
+            dList.append(filename)
+        # d += 1
+
+    dList.sort()
+    # print(dList)
+    pList = []
+    ddList = []
+
+    en_email = eList['email'].encode()
+    file = open(f'{euser}.key', "rb")
+    key = file.read()
+    file.close()
+    f = Fernet(key)
+    try:
+        pe_email = eList['email']
+        de_email = f.decrypt((en_email))
+        eList['email'] = de_email.decode()
+    except:
+        return 1
+
 
 def SQL_Check_Email(email,euser):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
