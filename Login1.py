@@ -35,6 +35,7 @@ import tkinter as tk
 from tkinter import ttk
 import os
 import pathlib
+from pathlib import Path
 import requests
 import time
 from flask_session import Session
@@ -53,7 +54,7 @@ app.secret_key = 'very secret'
 # Enter database connection details
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password123'
+app.config['MYSQL_PASSWORD'] = 'Dbsibm1001.'
 app.config['MYSQL_DB'] = 'sys_sec'
 
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
@@ -81,14 +82,14 @@ mail = Mail(app)
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-GOOGLE_CLIENT_ID = "20330302842-fgs38hbba4b63hmangsgbhdr5eg378fd.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = "20330302842-28sotd6auelvra12rqi94ah5rb456n23.apps.googleusercontent.com"
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
 flow = Flow.from_client_secrets_file(
     client_secrets_file=client_secrets_file,
     scopes=["https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email",
             "openid"],
-    redirect_uri="http://127.0.0.1:5000/callback"
+    redirect_uri="https://127.0.0.1:5000/callback"
 )
 
 
@@ -1076,4 +1077,4 @@ def login_2fa_form():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run('0.0.0.0', debug=True, port=5000, ssl_context=(Path('./ssl.crt'), Path('./ssl.key')))
