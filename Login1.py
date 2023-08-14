@@ -205,8 +205,8 @@ def login():
             if check_ratelimit(username) == 3:
                 return redirect(url_for('forceuser'))
 
-            # super important don't remove
-            # Generate OTP and store it in the session
+            # # super important don't remove
+            # # Generate OTP and store it in the session
             # otp = str(randint(100000, 999999))
             # session['otp'] = otp
             #
@@ -218,7 +218,7 @@ def login():
             #
             # # Send OTP via SMS
             # account_sid = 'ACa1c4471cfc07d62502d48bd509232754'
-            # auth_token = 'a49afdd6460799e837ab9a3c237b30bb'
+            # auth_token = '5a0fd865769b3025f40aaa31d6d35f26'
             # client = Client(account_sid, auth_token)
             #
             # message = client.messages.create(
