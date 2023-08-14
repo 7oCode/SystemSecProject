@@ -269,9 +269,9 @@ def login():
             # log_message = f"Successful registration for user {username} at time: {date_time_str}"
             add_audit_log(log_message, 'login')
 
-        authorization_url, state = flow.authorization_url()
-        session["state"] = state
-        return redirect(authorization_url)
+        # authorization_url, state = flow.authorization_url()
+        # session["state"] = state
+        # return redirect(authorization_url)
 
     # elif request.method == 'POST':
     #     msg = 'Incorrect Username/Password2'
@@ -399,7 +399,7 @@ def forceuser():
     #         error_msg = "Email does not exist in the database. Please enter a valid email address."
     #         return render_template('forgetpass.html', error=error_msg)
 
-    return render_template('forcereset.html', msg=msg, form=forgetForm)
+    return render_template('forcepass.html', msg=msg, form=forgetForm)
 
 
 @app.route('/forcechange', methods=['GET', 'POST'])
@@ -535,34 +535,34 @@ def register():
         if SQL_Register(username, password, email, phone, squest, s_ans) == 0:
             msg = 'Succcess'
 
-            token = s.dumps(email, salt='email-confirm')
-
-            v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
-
-            link = url_for('confirm_email', token=token, _external=True)
-
-            v_msg.body = 'To confirm your email, click the link {} . The link will expire in 3 minutes! Thank You'.format(
-                link)
-
-            mail.send(v_msg)
-
-            session['username'] = username
-            session['password'] = password
-            session['email'] = email
-            session['squest'] = squest
-            session['s_ans'] = s_ans
-
-            # phone = regform.phone.data  # Get the phone data from the form
-            session['phone'] = phone
-
-            # Validate the password using password_check()
-            password_validation = password_check(password)
-            print(password_validation)
-            print(password)
-            token = s.dumps(email, salt='email-confirm')
-            link = url_for('confirm_email', token=token, _external=True)
-
-            return render_template('thanks.html', username=username, password=password, email=email, link=link)
+            # token = s.dumps(email, salt='email-confirm')
+            #
+            # v_msg = Message('Confirm Email', sender='mohd.irfan.khan.9383@gmail.com', recipients=[email])
+            #
+            # link = url_for('confirm_email', token=token, _external=True)
+            #
+            # v_msg.body = 'To confirm your email, click the link {} . The link will expire in 3 minutes! Thank You'.format(
+            #     link)
+            #
+            # mail.send(v_msg)
+            #
+            # session['username'] = username
+            # session['password'] = password
+            # session['email'] = email
+            # session['squest'] = squest
+            # session['s_ans'] = s_ans
+            #
+            # # phone = regform.phone.data  # Get the phone data from the form
+            # session['phone'] = phone
+            #
+            # # Validate the password using password_check()
+            # password_validation = password_check(password)
+            # print(password_validation)
+            # print(password)
+            # token = s.dumps(email, salt='email-confirm')
+            # link = url_for('confirm_email', token=token, _external=True)
+            #
+            # return render_template('thanks.html', username=username, password=password, email=email, link=link)
 
             # Add a log entry for successful registration
             now = datetime.now()
