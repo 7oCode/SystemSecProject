@@ -414,15 +414,14 @@ def SQL_UpdatePasswordAndPhone(user_id, password, phone):
     mysql.connection.commit()
     cursor.close()
 
-def SQL_Update_Password(user,npass, opass,sans):
+def SQL_Update_Password(user,npass, sans):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute('SELECT * FROM users WHERE username = %s', (user,))
     uchange = cursor.fetchone()
     print(uchange)
-    ohash = uchange['password']
-    print(ohash)
-    print(uchange['password'])
-    if bcrypt.check_password_hash(ohash, opass) and (uchange['s_ans'] == sans):
+
+
+    if uchange['s_ans'] == sans:
         hashpwd = bcrypt.generate_password_hash(npass)
         cursor.execute("UPDATE users SET password = %s WHERE username = %s", (hashpwd,user,))
         mysql.connection.commit()
