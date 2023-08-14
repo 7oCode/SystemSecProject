@@ -1043,13 +1043,14 @@ def login_2fa():
 
     img = qr.make_image(fill_color="black", back_color="white")
     img_io = BytesIO()
-    img.save(img_io, format="PNG")
+    img.save(img_io)
     img_data = img_io.getvalue()
 
     # Encode the image data as base64
     img_base64 = base64.b64encode(img_data).decode("utf-8")
 
     return render_template("login_2fa.html", secret=secret, qr_code=img_base64)
+
 
 
 
