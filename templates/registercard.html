@@ -1,0 +1,156 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<head>
+  <link rel="stylesheet" href="{{ url_for('static', filename='registercard.css') }}">
+  <script src="{{ url_for('static', filename='register.js') }}">
+
+  </script>
+</head>
+
+<!---<div class="nav"></div>--->
+
+<div class="credit-card-page-container">
+  <h1 class="billing-title">Billing</h1>
+</div>
+
+<div class="layout-container">
+  <div class="left-col">
+    <h2>Your Cards</h2>
+      {% if cards|length != 0 %}
+      <table>
+          <th>
+
+              <tr>
+                  <th>Full Name</th>
+                  <th>Card Number</th>
+                  <th>Expiry Date</th>
+                  <th>Budget</th>
+              </tr>
+          </th>
+          <tbody>
+            {% for card in cards %}
+            <tr>
+                <td>{{card['fullname']}}</td>
+                <td>{{card['card_num']}}</td>
+                <td>{{card['exp_date']}}</td>
+                <td>{{card['budget']}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+      {% endif %}
+
+
+        {% if cards|length == 0 %}
+        <p>You haven't added a credit card yet.</p>
+        {% endif %}
+<!--         <div class="your-cards-container">
+          <div class="credit-card-loader">
+            <div class="credit-card-loader-fill"></div>
+            <div class="card-animation"></div>
+          </div>
+        </div> -->
+<!--         <div class="your-cards-container">
+      <div class="card-icon">
+        <div class="icon"></div>
+      </div>
+      <div class="card-info"><span class="card">Master Card</span> ending in 5444</div>
+      <div class="edit">EDIT</div>
+    </div> -->
+
+            <h2 class="order-history-title">Order History</h2>
+      {% if hist|length != 0 %}
+      <table>
+          <th>
+
+              <tr>
+                  <th>Transaction</th>
+                  <th>Card Number</th>
+                  <th>Cost</th>
+              </tr>
+          </th>
+          <tbody>
+            {% for trans in hist %}
+            <tr>
+                <td>{{trans['transaction']}}</td>
+                <td>{{trans['card_num']}}</td>
+                <td>{{trans['cost']}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+      {% endif %}
+
+
+        {% if hist|length == 0 %}
+    <p>You haven't purchased anything yet.</p>
+        {% endif %}
+  </div>
+  <div class="right-col">
+        <h2>Add Card</h2>
+
+    <div class="credit-card-container">
+  <div class="bg-circle-one"></div>
+  <div class="bg-circle-two"></div>
+  <div class="chip"></div>
+  <div class="credit-card-number-container">
+    <div class="first-four-numbers"></div>
+    <div class="second-four-numbers"></div>
+    <div class="third-four-numbers"></div>
+    <div class="fourth-four-numbers"></div>
+  </div>
+  <div class="name-container">
+    <div class="first-name"></div>
+    <div class="last-name"></div>
+  </div>
+
+  <div class="date-container">
+    <div class="date"></div>
+  </div>
+
+
+  <div class="master-card-logo-container">
+    <div class="yellow-circle"></div>
+    <div class="red-circle"></div>
+  </div>
+
+</div>
+
+<form method="POST" action="{{url_for('card')}}">
+  			{{ form.csrf_token }}
+
+      <div class="inputLabel">Card Number</div>
+        	{{ form.card_num }}
+
+      <div class="inputLabel">First Name</div>
+        	{{ form.fname }}
+
+      <div class="inputLabel">Last Name</div>
+        	{{ form.lname }}
+
+      <div class="card-info-container">
+        <div class="expiration-date-container">
+          <div class="inputLabel">Expiration Date</div>
+        	{{ form.exp_date }}
+        </div>
+      </div>
+         <div class="cvv-container">
+          <div class="inputLabel">CVV</div>
+            {{ form.cvv }}
+               {{ msg }}
+
+        </div>
+<!--        	{{ form.card_num }}-->
+<!--        	{{ form.fname }}-->
+<!--        	{{ form.lname }}-->
+<!--        	{{ form.exp_date }}-->
+<!--            {{ form.cvv }}-->
+      <input type="submit" value="Submit">
+
+</form>
+
+<!--  <button class="add-card">ADD CARD</button>-->
+  </div>
+</div>
+{% endblock %}

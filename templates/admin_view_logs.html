@@ -1,0 +1,48 @@
+{% extends 'admin_layout.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+<h2>Admin Home Page</h2>
+<p>Welcome back, {{ username }}!</p>
+
+    <div class="wrapper">
+        {% if logs|length != 0 %}
+          <table>
+              <th>
+                  <tr>
+                      <th>Serial ID</th>
+                      <th>Audit Logs</th>
+                  </tr>
+              </th>
+              <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{log[0]}}</td>
+                    <td>{{log[1]}}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+          </table>
+        {% endif %}
+
+
+        {% if logs|length == 0 %}
+        <p>There are no logs.</p>
+        {% endif %}
+
+<!--        <div class="page-header section-dark" style="background-image: url('http://demos.creative-tim.com/paper-kit-2/assets/img/antoine-barres.jpg')">-->
+<!--            <div class="filter"></div>-->
+<!--    		<div class="content-center">-->
+<!--    			<div class="container">-->
+<!--    				<div class="title-brand">-->
+<!--    					<h1 class="presentation-title">WELCOME</h1>-->
+
+<!--    		</div>-->
+<!--            <div class="moving-clouds" style="background-image: url('http://demos.creative-tim.com/paper-kit-2/assets/img/clouds.png'); ">-->
+
+<!--            </div>-->
+<!--    	</div>-->
+  </div>
+
+{% endblock %}
